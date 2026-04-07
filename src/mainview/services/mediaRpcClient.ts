@@ -3,11 +3,13 @@ import type { ExtractResult, HistoryData, InjectResult } from "~/shared/types";
 
 export async function extractMetadata(
   imagesFolder: string,
-  outputExcel: string,
+  outputFolder: string,
+  outputFilename: string,
 ): Promise<ExtractResult> {
   const result = await electroview.rpc?.request.extractMetadata({
     imagesFolder,
-    outputExcel,
+    outputFolder,
+    outputFilename,
   });
 
   return result || { success: false, message: "No response" };

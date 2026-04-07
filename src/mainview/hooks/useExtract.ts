@@ -9,7 +9,8 @@ import type { ExtractResult } from "~/shared/types";
 
 export type ExtractParams = {
   imagesFolder: string;
-  outputExcel: string;
+  outputFolder: string;
+  outputFilename: string;
 };
 
 export function useExtractMetadata(
@@ -19,8 +20,12 @@ export function useExtractMetadata(
 
   return useMutation({
     ...options,
-    mutationFn: ({ imagesFolder, outputExcel }) =>
-      extractMetadata(imagesFolder, outputExcel),
+    mutationFn: (params) =>
+      extractMetadata(
+        params.imagesFolder,
+        params.outputFolder,
+        params.outputFilename,
+      ),
     onSuccess: (...params) => {
       options?.onSuccess?.(...params);
       queryClient.invalidateQueries({

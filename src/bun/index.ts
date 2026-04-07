@@ -1,3 +1,4 @@
+import path from "node:path";
 import { BrowserView, BrowserWindow, Updater } from "electrobun/bun";
 import type { MainWebviewRPCType } from "~/shared/types";
 import { extractMetadata as bunExtractMetadata } from "./services/extractService";
@@ -55,11 +56,19 @@ const mainWebviewRPC = BrowserView.defineRPC<MainWebviewRPCType>({
         });
       },
       extractMetadata: async (params) => {
-        const result = await bunExtractMetadata(params);
+        // Merge output folder and filename using node:path for proper handling
+        const outputExcel = path.join(
+          params.outputFolder,
+          params.outputFilename,
+        );
+        const result = await bunExtractMetadata({
+          imagesFolder: params.imagesFolder,
+          outputExcel,
+        });
         if (result.success) {
           updateHistory({
             lastImagesFolder: params.imagesFolder,
-            lastOutputExcel: params.outputExcel,
+            lastOutputExcel: outputExcel,
           });
         }
         return result;
@@ -100,7 +109,7 @@ const _mainWindow = new BrowserWindow({
   url,
   frame: {
     width: 900,
-    height: 700,
+    height: 600,
     x: 200,
     y: 200,
   },

@@ -32,7 +32,8 @@ export type MainWebviewRPCType = {
       extractMetadata: {
         params: {
           imagesFolder: string;
-          outputExcel: string;
+          outputFolder: string;
+          outputFilename: string;
         };
         response: ExtractResult;
       };

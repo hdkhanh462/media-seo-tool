@@ -16,7 +16,8 @@ import { useSelectFolder } from "@/hooks/useSelectFolder";
 
 export function ExtractTab() {
   const [imagesFolder, setImagesFolder] = useState("");
-  const [outputExcel, setOutputExcel] = useState("data_template.xlsx");
+  const [outputFolder, setOutputFolder] = useState("");
+  const [outputFilename, setOutputFilename] = useState("data_template.xlsx");
   const [result, setResult] = useState<string>("");
 
   const historyQuery = useHistoryData();
@@ -30,6 +31,19 @@ export function ExtractTab() {
     onError: (error) => {
       setResult(
         `Error: ${error instanceof Error ? error.message : "Failed to select folder"}`,
+      );
+    },
+  });
+  const outputFolderSelect = useSelectFolder({
+    onSuccess: (res) => {
+      if (res.path) {
+        setOutputFolder(res.path);
+      }
+      setResult(res.message);
+    },
+    onError: (error) => {
+      setResult(
+        `Error: ${error instanceof Error ? error.message : "Failed to select output folder"}`,
       );
     },
   });
@@ -54,12 +68,25 @@ export function ExtractTab() {
       setImagesFolder(historyQuery.data.lastImagesFolder);
     }
     if (historyQuery.data.lastOutputExcel) {
-      setOutputExcel(historyQuery.data.lastOutputExcel);
+      const lastOutput = historyQuery.data.lastOutputExcel;
+      const lastFolder = lastOutput.substring(
+        0,
+        lastOutput.lastIndexOf("\\") || lastOutput.lastIndexOf("/"),
+      );
+      const lastFilename = lastOutput.substring(
+        lastOutput.lastIndexOf("\\") + 1 || lastOutput.lastIndexOf("/") + 1,
+      );
+      setOutputFolder(lastFolder);
+      setOutputFilename(lastFilename);
     }
   }, [historyQuery.data]);
 
   const handleFolderSelect = async () => {
     folderSelect.mutate();
+  };
+
+  const handleOutputFolderSelect = async () => {
+    outputFolderSelect.mutate();
   };
 
   const handleRun = async () => {
@@ -68,9 +95,18 @@ export function ExtractTab() {
       return;
     }
 
+    if (!outputFolder.trim()) {
+      setResult("Please select output folder first.");
+      return;
+    }
+
     setResult("");
 
-    extractMutation.mutate({ imagesFolder, outputExcel });
+    extractMutation.mutate({
+      imagesFolder,
+      outputFolder,
+      outputFilename,
+    });
   };
 
   return (
@@ -102,14 +138,32 @@ export function ExtractTab() {
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="output-excel">Output Excel</Label>
-            <Input
-              id="output-excel"
-              value={outputExcel}
-              onChange={(e) => setOutputExcel(e.target.value)}
-              placeholder="Output Excel filename"
-            />
+            <Label htmlFor="output-folder">Output Folder</Label>
+            <div className="flex gap-2">
+              <Input
+                id="output-folder"
+                value={outputFolder}
+                onChange={(e) => setOutputFolder(e.target.value)}
+                placeholder="Click folder icon to select output folder"
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleOutputFolderSelect}
+              >
+                <FolderOpen className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="output-filename">Output Filename</Label>
+          <Input
+            id="output-filename"
+            value={outputFilename}
+            onChange={(e) => setOutputFilename(e.target.value)}
+            placeholder="Output Excel filename"
+          />
         </div>
         <Button onClick={handleRun} disabled={isRunning}>
           {isRunning ? "Extracting..." : "Start Extraction"}
