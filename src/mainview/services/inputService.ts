@@ -1,9 +1,11 @@
 import { electroview } from "@/services";
 
 export const selectFile = async () => {
-  return electroview.rpc?.request.selectExcelFile();
+  const result = await electroview.rpc?.request.selectExcelFile();
+  return result || { path: null, message: "No response" };
 };
 
 export const selectFolder = async () => {
-  return electroview.rpc?.request.selectFolder();
+  const result = await electroview.rpc?.request.selectFolder();
+  return result || { path: null, message: "No response" };
 };

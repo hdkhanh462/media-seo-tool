@@ -22,10 +22,10 @@ export function ExtractTab() {
   const handleFolderSelect = async () => {
     try {
       const res = await selectFolder();
-      if (res?.folderPath) {
-        setImagesFolder(res.folderPath);
+      if (res.path) {
+        setImagesFolder(res.path);
       }
-      setResult(res?.message || "No folder selected");
+      setResult(res.message);
     } catch (error) {
       setResult(
         `Error: ${error instanceof Error ? error.message : "Failed to select folder"}`,

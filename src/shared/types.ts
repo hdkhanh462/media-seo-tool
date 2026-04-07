@@ -13,6 +13,11 @@ export type InjectResult = {
   failCount?: number;
 };
 
+export type OpenFileDialogResult = {
+  path: string | null;
+  message: string;
+};
+
 export type MainWebviewRPCType = {
   // functions that execute in the main process
   bun: RPCSchema<{
@@ -33,11 +38,11 @@ export type MainWebviewRPCType = {
       };
       selectFolder: {
         params: undefined;
-        response: { folderPath: string | null; message: string };
+        response: OpenFileDialogResult;
       };
       selectExcelFile: {
         params: undefined;
-        response: { filePath: string | null; message: string };
+        response: OpenFileDialogResult;
       };
       someBunFunction: {
         params: {

@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { selectFile, selectFolder } from "@/services/inputService";
 import { injectMetadata } from "@/services/mediaRpcClient";
-import { selectFile, selectFolder } from "@/utils/input";
 
 export function InjectTab() {
   const [imagesFolder, setImagesFolder] = useState("");
@@ -19,12 +19,20 @@ export function InjectTab() {
   const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState<string>("");
 
-  const handleFolderSelect = () => {
-    selectFolder((folderName) => setImagesFolder(folderName));
+  const handleFolderSelect = async () => {
+    const res = await selectFolder();
+    if (res.path) {
+      setImagesFolder(res.path);
+    }
+    setResult(res.message);
   };
 
-  const handleFileSelect = () => {
-    selectFile((fileName) => setExcelFile(fileName));
+  const handleFileSelect = async () => {
+    const res = await selectFile();
+    if (res.path) {
+      setExcelFile(res.path);
+    }
+    setResult(res.message);
   };
 
   const handleRun = async () => {
