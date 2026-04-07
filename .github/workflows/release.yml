@@ -1,0 +1,45 @@
+name: Build & Release (Electrobun)
+
+on:
+  push:
+    tags:
+      - 'v*' # example: v1.0.0
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        # os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Cache bun
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+
+      - name: Install deps
+        run: bun install
+
+      - name: Build app
+        run: bun run build:canary
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: |
+            artifacts/**/*.zip
+            artifacts/**/*.tar.zst
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
