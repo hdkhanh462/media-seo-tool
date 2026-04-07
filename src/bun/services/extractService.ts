@@ -49,10 +49,13 @@ export async function extractMetadata(
   const mediaExtensions = [".jpg", ".jpeg", ".png", ".mp4", ".mov", ".webp"];
 
   let processedCount = 0;
-
-  const limit = pLimit(concurrent);
-  const tasks: Promise<void>[] = [];
   const rows: Record<string, unknown>[] = [];
+
+  // Use sequential processing instead of concurrent to avoid exiftool BatchCluster crashes
+  // Windows exiftool-vendored doesn't handle high concurrency well
+  const safeLimit = Math.min(2, concurrent); // Max 2 concurrent to prevent exiftool crashes
+  const limit = pLimit(safeLimit);
+  const tasks: Promise<void>[] = [];
 
   for (const file of files) {
     const ext = path.extname(file).toLowerCase();

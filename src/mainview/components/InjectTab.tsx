@@ -11,42 +11,34 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { injectMetadata } from "@/services/mediaRpcClient";
+import { selectFile, selectFolder } from "@/utils/input";
 
 export function InjectTab() {
-  const [imagesFolder, setImagesFolder] = useState("./my_files");
+  const [imagesFolder, setImagesFolder] = useState("");
   const [excelFile, setExcelFile] = useState("data.xlsx");
   const [concurrent, setConcurrent] = useState(5);
   const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState<string>("");
 
   const handleFolderSelect = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.webkitdirectory = true;
-    input.onchange = (e) => {
-      const files = (e.target as HTMLInputElement).files;
-      if (files && files.length > 0) {
-        const dir = files[0].webkitRelativePath.split("/")[0];
-        setImagesFolder(dir);
-      }
-    };
-    input.click();
+    selectFolder((folderName) => setImagesFolder(folderName));
   };
 
   const handleFileSelect = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".xlsx,.xls";
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        setExcelFile(file.name);
-      }
-    };
-    input.click();
+    selectFile((fileName) => setExcelFile(fileName));
   };
 
   const handleRun = async () => {
+    if (!imagesFolder.trim()) {
+      setResult("Please select a folder first.");
+      return;
+    }
+
+    if (!excelFile.trim()) {
+      setResult("Please select an Excel file first.");
+      return;
+    }
+
     setIsRunning(true);
     setResult("");
 
@@ -73,7 +65,7 @@ export function InjectTab() {
                 id="images-folder"
                 value={imagesFolder}
                 onChange={(e) => setImagesFolder(e.target.value)}
-                placeholder="Path to media folder"
+                placeholder="Click folder icon to select media folder"
               />
               <Button
                 variant="outline"

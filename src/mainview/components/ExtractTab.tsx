@@ -10,39 +10,49 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { selectFolder } from "@/services/inputService";
 import { extractMetadata } from "@/services/mediaRpcClient";
 
 export function ExtractTab() {
-  const [imagesFolder, setImagesFolder] = useState("./my_files");
+  const [imagesFolder, setImagesFolder] = useState("");
   const [outputExcel, setOutputExcel] = useState("data_template.xlsx");
   const [concurrent, setConcurrent] = useState(5);
   const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState<string>("");
 
-  const handleFolderSelect = () => {
-    // In a real desktop app, use file picker API
-    // For now, use input
-    const input = document.createElement("input");
-    input.type = "file";
-    input.webkitdirectory = true;
-    input.onchange = (e) => {
-      const files = (e.target as HTMLInputElement).files;
-      if (files && files.length > 0) {
-        const dir = files[0].webkitRelativePath.split("/")[0];
-        setImagesFolder(dir);
+  const handleFolderSelect = async () => {
+    try {
+      const res = await selectFolder();
+      if (res?.folderPath) {
+        setImagesFolder(res.folderPath);
       }
-    };
-    input.click();
+      setResult(res?.message || "No folder selected");
+    } catch (error) {
+      setResult(
+        `Error: ${error instanceof Error ? error.message : "Failed to select folder"}`,
+      );
+    }
   };
 
   const handleRun = async () => {
+    if (!imagesFolder.trim()) {
+      setResult("Please select a folder first.");
+      return;
+    }
+
     setIsRunning(true);
     setResult("");
 
-    const res = await extractMetadata(imagesFolder, outputExcel, concurrent);
-    setResult(res.message);
-
-    setIsRunning(false);
+    try {
+      const res = await extractMetadata(imagesFolder, outputExcel, concurrent);
+      setResult(res.message);
+    } catch (error) {
+      setResult(
+        `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
+    } finally {
+      setIsRunning(false);
+    }
   };
 
   return (
@@ -62,7 +72,7 @@ export function ExtractTab() {
                 id="images-folder"
                 value={imagesFolder}
                 onChange={(e) => setImagesFolder(e.target.value)}
-                placeholder="Path to media folder"
+                placeholder="Click folder icon to select media folder"
               />
               <Button
                 variant="outline"

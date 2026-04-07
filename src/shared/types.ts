@@ -33,6 +33,14 @@ export type MainWebviewRPCType = {
         };
         response: InjectResult;
       };
+      selectFolder: {
+        params: undefined;
+        response: { folderPath: string | null; message: string };
+      };
+      selectExcelFile: {
+        params: undefined;
+        response: { filePath: string | null; message: string };
+      };
       someBunFunction: {
         params: {
           a: number;

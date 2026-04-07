@@ -1,7 +1,15 @@
-import { BrowserView, BrowserWindow, Updater } from "electrobun/bun";
+import { BrowserView, BrowserWindow, Updater, Utils } from "electrobun/bun";
 import type { MainWebviewRPCType } from "~/shared/types";
 import { extractMetadata as bunExtractMetadata } from "./services/extractService";
 import { injectMetadata as bunInjectMetadata } from "./services/injectService";
+
+export interface OpenFileDialogOptions {
+  canChooseDirectory?: boolean;
+  canChooseFiles?: boolean;
+  allowsMultipleSelection?: boolean;
+  directoryURL?: string;
+  allowedFileTypes?: string[];
+}
 
 const DEV_SERVER_PORT = 5173;
 const DEV_SERVER_URL = `http://localhost:${DEV_SERVER_PORT}`;
@@ -28,9 +36,51 @@ const url = await getMainViewUrl();
 
 // Create an RPC object for the bun handlers with the shared type
 const mainWebviewRPC = BrowserView.defineRPC<MainWebviewRPCType>({
-  maxRequestTime: 30000, // increased timeout for file operations
+  maxRequestTime: 120000, // increased timeout for file operations (120s for large extractions)
   handlers: {
     requests: {
+      selectFolder: async () => {
+        try {
+          const filePaths = await Utils.openFileDialog({
+            canChooseDirectory: true,
+          });
+          if (filePaths && filePaths.length > 0) {
+            console.log(`Selected folder: ${filePaths[0]}`);
+            return {
+              folderPath: filePaths[0],
+              message: "Folder selected successfully",
+            };
+          }
+          return { folderPath: null, message: "No folder selected" };
+        } catch (error) {
+          console.error("Error opening folder dialog:", error);
+          return {
+            folderPath: null,
+            message: "Error occurred while selecting folder",
+          };
+        }
+      },
+      selectExcelFile: async () => {
+        try {
+          const filePaths = await Utils.openFileDialog({
+            canChooseFiles: true,
+            allowedFileTypes: "xlsx, xls",
+          });
+          if (filePaths && filePaths.length > 0) {
+            return {
+              filePath: filePaths[0],
+              message: "File selected successfully",
+            };
+          }
+          return { filePath: null, message: "No file selected" };
+        } catch (error) {
+          console.error("Error opening file dialog:", error);
+          return {
+            filePath: null,
+            message: "Error occurred while selecting file",
+          };
+        }
+      },
       extractMetadata: async (params) => {
         return bunExtractMetadata(params);
       },
