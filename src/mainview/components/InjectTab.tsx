@@ -1,5 +1,5 @@
 import { FileText, FolderOpen } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,32 +10,77 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { selectFile, selectFolder } from "@/services/inputService";
-import { injectMetadata } from "@/services/mediaRpcClient";
+import { useHistoryData } from "@/hooks/useHistory";
+import { useInjectMetadata } from "@/hooks/useInject";
+import { useSelectExcel } from "@/hooks/useSelectExcel";
+import { useSelectFolder } from "@/hooks/useSelectFolder";
 
 export function InjectTab() {
   const [imagesFolder, setImagesFolder] = useState("");
   const [excelFile, setExcelFile] = useState("data.xlsx");
-  const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState<string>("");
 
-  const handleFolderSelect = async () => {
-    const res = await selectFolder();
-    if (res.path) {
-      setImagesFolder(res.path);
+  const historyQuery = useHistoryData();
+  const folderSelect = useSelectFolder({
+    onSuccess: (res) => {
+      if (res.path) {
+        setImagesFolder(res.path);
+      }
+      setResult(res.message);
+    },
+    onError: (error) => {
+      setResult(
+        `Error: ${error instanceof Error ? error.message : "Failed to select folder"}`,
+      );
+    },
+  });
+  const fileSelect = useSelectExcel({
+    onSuccess: (res) => {
+      if (res.path) {
+        setExcelFile(res.path);
+      }
+      setResult(res.message);
+    },
+    onError: (error) => {
+      setResult(
+        `Error: ${error instanceof Error ? error.message : "Failed to select Excel file"}`,
+      );
+    },
+  });
+  const injectMutation = useInjectMetadata({
+    onSuccess: (res) => {
+      setResult(
+        `Injection completed: ${res.successCount ?? 0} succeeded, ${res.failCount ?? 0} failed.`,
+      );
+    },
+    onError: (error) => {
+      setResult(
+        `Error: ${error instanceof Error ? error.message : "Injection failed"}`,
+      );
+    },
+  });
+
+  const isRunning = injectMutation.isPending;
+
+  useEffect(() => {
+    if (!historyQuery.data) return;
+    if (historyQuery.data.lastImagesFolder) {
+      setImagesFolder(historyQuery.data.lastImagesFolder);
     }
-    setResult(res.message);
+    if (historyQuery.data.lastExcelFile) {
+      setExcelFile(historyQuery.data.lastExcelFile);
+    }
+  }, [historyQuery.data]);
+
+  const handleFolderSelect = () => {
+    folderSelect.mutate();
   };
 
   const handleFileSelect = async () => {
-    const res = await selectFile();
-    if (res.path) {
-      setExcelFile(res.path);
-    }
-    setResult(res.message);
+    fileSelect.mutate();
   };
 
-  const handleRun = async () => {
+  const handleRun = () => {
     if (!imagesFolder.trim()) {
       setResult("Please select a folder first.");
       return;
@@ -46,13 +91,9 @@ export function InjectTab() {
       return;
     }
 
-    setIsRunning(true);
     setResult("");
 
-    const res = await injectMetadata(imagesFolder, excelFile);
-    setResult(res.message);
-
-    setIsRunning(false);
+    injectMutation.mutate({ excelFile, imagesFolder });
   };
 
   return (

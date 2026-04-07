@@ -1,5 +1,5 @@
 import { FolderOpen } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,27 +10,56 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { selectFolder } from "@/services/inputService";
-import { extractMetadata } from "@/services/mediaRpcClient";
+import { useExtractMetadata } from "@/hooks/useExtract";
+import { useHistoryData } from "@/hooks/useHistory";
+import { useSelectFolder } from "@/hooks/useSelectFolder";
 
 export function ExtractTab() {
   const [imagesFolder, setImagesFolder] = useState("");
   const [outputExcel, setOutputExcel] = useState("data_template.xlsx");
-  const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState<string>("");
 
-  const handleFolderSelect = async () => {
-    try {
-      const res = await selectFolder();
+  const historyQuery = useHistoryData();
+  const folderSelect = useSelectFolder({
+    onSuccess: (res) => {
       if (res.path) {
         setImagesFolder(res.path);
       }
       setResult(res.message);
-    } catch (error) {
+    },
+    onError: (error) => {
       setResult(
         `Error: ${error instanceof Error ? error.message : "Failed to select folder"}`,
       );
+    },
+  });
+  const extractMutation = useExtractMetadata({
+    onSuccess: (res) => {
+      setResult(
+        `Extraction completed: ${res.processedCount ?? 0} files processed. ${res.message}`,
+      );
+    },
+    onError: (error) => {
+      setResult(
+        `Error: ${error instanceof Error ? error.message : "Extraction failed"}`,
+      );
+    },
+  });
+
+  const isRunning = extractMutation.isPending;
+
+  useEffect(() => {
+    if (!historyQuery.data) return;
+    if (historyQuery.data.lastImagesFolder) {
+      setImagesFolder(historyQuery.data.lastImagesFolder);
     }
+    if (historyQuery.data.lastOutputExcel) {
+      setOutputExcel(historyQuery.data.lastOutputExcel);
+    }
+  }, [historyQuery.data]);
+
+  const handleFolderSelect = async () => {
+    folderSelect.mutate();
   };
 
   const handleRun = async () => {
@@ -39,19 +68,9 @@ export function ExtractTab() {
       return;
     }
 
-    setIsRunning(true);
     setResult("");
 
-    try {
-      const res = await extractMetadata(imagesFolder, outputExcel);
-      setResult(res.message);
-    } catch (error) {
-      setResult(
-        `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-      );
-    } finally {
-      setIsRunning(false);
-    }
+    extractMutation.mutate({ imagesFolder, outputExcel });
   };
 
   return (

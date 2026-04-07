@@ -18,6 +18,13 @@ export type OpenFileDialogResult = {
   message: string;
 };
 
+export type HistoryData = {
+  lastImagesFolder?: string;
+  lastExcelFile?: string;
+  lastOutputExcel?: string;
+  lastUsed?: string;
+};
+
 export type MainWebviewRPCType = {
   // functions that execute in the main process
   bun: RPCSchema<{
@@ -43,6 +50,10 @@ export type MainWebviewRPCType = {
       selectExcelFile: {
         params: undefined;
         response: OpenFileDialogResult;
+      };
+      loadHistory: {
+        params: undefined;
+        response: HistoryData;
       };
       someBunFunction: {
         params: {

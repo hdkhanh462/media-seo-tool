@@ -1,6 +1,7 @@
 import { BrowserView, BrowserWindow, Updater } from "electrobun/bun";
 import type { MainWebviewRPCType } from "~/shared/types";
 import { extractMetadata as bunExtractMetadata } from "./services/extractService";
+import { loadHistory, updateHistory } from "./services/historyService";
 import { injectMetadata as bunInjectMetadata } from "./services/injectService";
 import { openFileDialog } from "./services/inputService";
 
@@ -54,10 +55,27 @@ const mainWebviewRPC = BrowserView.defineRPC<MainWebviewRPCType>({
         });
       },
       extractMetadata: async (params) => {
-        return bunExtractMetadata(params);
+        const result = await bunExtractMetadata(params);
+        if (result.success) {
+          updateHistory({
+            lastImagesFolder: params.imagesFolder,
+            lastOutputExcel: params.outputExcel,
+          });
+        }
+        return result;
       },
       injectMetadata: async (params) => {
-        return bunInjectMetadata(params);
+        const result = await bunInjectMetadata(params);
+        if (result.success) {
+          updateHistory({
+            lastImagesFolder: params.imagesFolder,
+            lastExcelFile: params.excelFile,
+          });
+        }
+        return result;
+      },
+      loadHistory: async () => {
+        return loadHistory();
       },
       someBunFunction: ({ a, b }) => {
         console.log(`browser asked me to do math with: ${a} and ${b}`);

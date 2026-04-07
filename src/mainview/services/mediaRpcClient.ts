@@ -1,5 +1,5 @@
 import { electroview } from "@/services";
-import type { ExtractResult, InjectResult } from "~/shared/types";
+import type { ExtractResult, HistoryData, InjectResult } from "~/shared/types";
 
 export async function extractMetadata(
   imagesFolder: string,
@@ -23,4 +23,9 @@ export async function injectMetadata(
   });
 
   return result || { success: false, message: "No response" };
+}
+
+export async function loadHistory(): Promise<HistoryData> {
+  const result = await electroview.rpc?.request.loadHistory();
+  return result || {};
 }
