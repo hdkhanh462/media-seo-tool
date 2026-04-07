@@ -1,6 +1,6 @@
-import ExcelJS from "exceljs";
+import { createInterface } from "node:readline";
+import type ExcelJS from "exceljs";
 import type { Tags } from "exiftool-vendored";
-import { createInterface } from "readline";
 
 export const pause = () => {
   const rl = createInterface({ input: process.stdin, output: process.stdout });
