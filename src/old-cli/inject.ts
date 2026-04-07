@@ -1,8 +1,8 @@
+import fs from "node:fs";
+import path from "node:path";
+import { parseArgs } from "node:util";
 import ExcelJS from "exceljs";
 import { exiftool } from "exiftool-vendored";
-import fs from "fs";
-import path from "path";
-import { parseArgs } from "util";
 import pLimit from "p-limit";
 
 import { logger } from "./logger";
@@ -52,7 +52,7 @@ if (values.help) {
 
 const FOLDER_PATH = (values["images-folder"] as string) || "./my_files";
 const EXCEL_FILE = (values["excel-file"] as string) || "data.xlsx";
-const CONCURRENT_LIMIT = parseInt(values.concurrent as string) || 5;
+const CONCURRENT_LIMIT = parseInt(values.concurrent as string, 10) || 5;
 
 // 2. Main Injection Logic
 async function runInjector() {
