@@ -1,9 +1,14 @@
 import fs from "node:fs";
 import path from "node:path";
 import ExcelJS from "exceljs";
-import { exiftool } from "exiftool-vendored";
+import { ExifTool } from "exiftool-vendored";
 
 import { getRowData } from "../../old-cli/utils";
+
+// Helper to get a fresh exiftool instance
+function getExiftoolInstance() {
+  return new ExifTool();
+}
 
 export interface InjectOptions {
   imagesFolder: string;
@@ -63,6 +68,9 @@ export async function injectMetadata(
 
       console.log(`Injecting metadata: ${fileName}`);
 
+      // Create a fresh exiftool instance for each file to avoid BatchCluster issues
+      const exiftool = getExiftoolInstance();
+
       try {
         const { title, subject, rating, tagsRaw, tagsArray, comment } =
           getRowData(row);
@@ -92,6 +100,9 @@ export async function injectMetadata(
       } catch (err: unknown) {
         console.error(`Failed ${fileName}: ${(err as Error).message}`);
         failCount++;
+      } finally {
+        // Clean up the exiftool instance
+        await exiftool.end();
       }
     }
 
@@ -107,7 +118,5 @@ export async function injectMetadata(
   } catch (error: unknown) {
     console.error(`Execution error: ${(error as Error).message}`);
     return { success: false, message: "Execution error" };
-  } finally {
-    await exiftool.end();
   }
 }
