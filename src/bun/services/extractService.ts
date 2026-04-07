@@ -2,14 +2,12 @@ import fs from "node:fs";
 import path from "node:path";
 import ExcelJS from "exceljs";
 import { exiftool } from "exiftool-vendored";
-import pLimit from "p-limit";
 
 import { getExif } from "../../old-cli/utils";
 
 export interface ExtractOptions {
   imagesFolder: string;
   outputExcel: string;
-  concurrent: number;
 }
 
 export interface ExtractResult {
@@ -21,12 +19,11 @@ export interface ExtractResult {
 export async function extractMetadata(
   options: ExtractOptions,
 ): Promise<ExtractResult> {
-  const { imagesFolder, outputExcel, concurrent } = options;
+  const { imagesFolder, outputExcel } = options;
 
   console.log("Starting Media Metadata Extractor...");
   console.log(`Target Folder: ${path.resolve(imagesFolder)}`);
   console.log(`Output Excel: ${path.resolve(outputExcel)}`);
-  console.log(`Concurrent Tasks: ${concurrent}`);
 
   if (!fs.existsSync(imagesFolder)) {
     console.error(`Folder not found: ${imagesFolder}`);
@@ -51,56 +48,43 @@ export async function extractMetadata(
   let processedCount = 0;
   const rows: Record<string, unknown>[] = [];
 
-  // Use sequential processing instead of concurrent to avoid exiftool BatchCluster crashes
-  // Windows exiftool-vendored doesn't handle high concurrency well
-  const safeLimit = Math.min(2, concurrent); // Max 2 concurrent to prevent exiftool crashes
-  const limit = pLimit(safeLimit);
-  const tasks: Promise<void>[] = [];
-
   for (const file of files) {
     const ext = path.extname(file).toLowerCase();
     if (!mediaExtensions.includes(ext)) continue;
 
     const filePath = path.join(imagesFolder, file);
 
-    const task = limit(async () => {
-      console.log(`Reading metadata: ${file}`);
+    console.log(`Reading metadata: ${file}`);
 
-      try {
-        const tags = await exiftool.read(filePath);
-        const { title, subject, rating, tagArray, comments } = getExif(tags);
+    try {
+      const tags = await exiftool.read(filePath);
+      const { title, subject, rating, tagArray, comments } = getExif(tags);
 
-        rows.push({
-          fileName: file,
-          title,
-          subject,
-          rating,
-          tags: tagArray,
-          comments,
-        });
+      rows.push({
+        fileName: file,
+        title,
+        subject,
+        rating,
+        tags: tagArray,
+        comments,
+      });
 
-        processedCount++;
-      } catch (err: unknown) {
-        console.warn(
-          `Could not read metadata for ${file}: ${(err as Error).message}`,
-        );
+      processedCount++;
+    } catch (err: unknown) {
+      console.warn(
+        `Could not read metadata for ${file}: ${(err as Error).message}`,
+      );
 
-        rows.push({
-          fileName: file,
-          title: "",
-          subject: "",
-          rating: 0,
-          tags: "",
-          comments: "",
-        });
-      }
-    });
-
-    tasks.push(task);
+      rows.push({
+        fileName: file,
+        title: "",
+        subject: "",
+        rating: 0,
+        tags: "",
+        comments: "",
+      });
+    }
   }
-
-  // Run all tasks with concurrency limit
-  await Promise.all(tasks);
 
   // Sort for stable output
   rows.sort((a, b) =>

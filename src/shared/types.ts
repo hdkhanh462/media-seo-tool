@@ -21,7 +21,6 @@ export type MainWebviewRPCType = {
         params: {
           imagesFolder: string;
           outputExcel: string;
-          concurrent: number;
         };
         response: ExtractResult;
       };
@@ -29,7 +28,6 @@ export type MainWebviewRPCType = {
         params: {
           imagesFolder: string;
           excelFile: string;
-          concurrent: number;
         };
         response: InjectResult;
       };

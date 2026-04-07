@@ -16,7 +16,6 @@ import { extractMetadata } from "@/services/mediaRpcClient";
 export function ExtractTab() {
   const [imagesFolder, setImagesFolder] = useState("");
   const [outputExcel, setOutputExcel] = useState("data_template.xlsx");
-  const [concurrent, setConcurrent] = useState(5);
   const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState<string>("");
 
@@ -44,7 +43,7 @@ export function ExtractTab() {
     setResult("");
 
     try {
-      const res = await extractMetadata(imagesFolder, outputExcel, concurrent);
+      const res = await extractMetadata(imagesFolder, outputExcel);
       setResult(res.message);
     } catch (error) {
       setResult(
@@ -92,17 +91,6 @@ export function ExtractTab() {
               placeholder="Output Excel filename"
             />
           </div>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="concurrent">Concurrent Tasks</Label>
-          <Input
-            id="concurrent"
-            type="number"
-            value={concurrent}
-            onChange={(e) => setConcurrent(parseInt(e.target.value, 10) || 5)}
-            min={1}
-            max={20}
-          />
         </div>
         <Button onClick={handleRun} disabled={isRunning}>
           {isRunning ? "Extracting..." : "Start Extraction"}

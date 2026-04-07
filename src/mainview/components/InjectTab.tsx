@@ -16,7 +16,6 @@ import { selectFile, selectFolder } from "@/utils/input";
 export function InjectTab() {
   const [imagesFolder, setImagesFolder] = useState("");
   const [excelFile, setExcelFile] = useState("data.xlsx");
-  const [concurrent, setConcurrent] = useState(5);
   const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState<string>("");
 
@@ -42,7 +41,7 @@ export function InjectTab() {
     setIsRunning(true);
     setResult("");
 
-    const res = await injectMetadata(imagesFolder, excelFile, concurrent);
+    const res = await injectMetadata(imagesFolder, excelFile);
     setResult(res.message);
 
     setIsRunning(false);
@@ -90,17 +89,6 @@ export function InjectTab() {
               </Button>
             </div>
           </div>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="concurrent">Concurrent Tasks</Label>
-          <Input
-            id="concurrent"
-            type="number"
-            value={concurrent}
-            onChange={(e) => setConcurrent(parseInt(e.target.value, 10) || 5)}
-            min={1}
-            max={20}
-          />
         </div>
         <Button onClick={handleRun} disabled={isRunning}>
           {isRunning ? "Injecting..." : "Start Injection"}
