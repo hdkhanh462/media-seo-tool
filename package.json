@@ -7,7 +7,9 @@
     "dev": "electrobun dev --watch",
     "dev:hmr": "concurrently \"bun run hmr\" \"bun run start\"",
     "hmr": "vite --port 5173",
-    "build:canary": "vite build && electrobun build --env=canary"
+    "build:canary": "vite build && electrobun build --env=canary",
+    "check": "biome check --write .",
+    "check:unsafe": "biome check --write --unsafe ."
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",
@@ -32,6 +34,7 @@
     "autoprefixer": "^10.4.20",
     "concurrently": "^9.1.0",
     "typescript": "^5.7.2",
-    "vite": "^6.0.3"
+    "vite": "^6.0.3",
+    "@biomejs/biome": "^2.2.0"
   }
 }
