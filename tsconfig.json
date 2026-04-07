@@ -18,8 +18,8 @@
     "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
-      "~/*": ["src/*"],
-      "@/*": ["src/mainview/*"]
+      "@/*": ["src/mainview/*"],
+      "~/*": ["src/*"]
     }
   },
   "include": ["src"],

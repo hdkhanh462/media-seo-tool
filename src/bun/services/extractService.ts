@@ -18,30 +18,18 @@ export interface ExtractResult {
   processedCount?: number;
 }
 
-export interface LogEntry {
-  type: "info" | "success" | "warn" | "error";
-  message: string;
-}
-
 export async function extractMetadata(
   options: ExtractOptions,
-  onLog: (log: LogEntry) => void,
 ): Promise<ExtractResult> {
   const { imagesFolder, outputExcel, concurrent } = options;
 
-  onLog({ type: "info", message: "Starting Media Metadata Extractor..." });
-  onLog({
-    type: "info",
-    message: `Target Folder: ${path.resolve(imagesFolder)}`,
-  });
-  onLog({
-    type: "info",
-    message: `Output Excel: ${path.resolve(outputExcel)}`,
-  });
-  onLog({ type: "info", message: `Concurrent Tasks: ${concurrent}` });
+  console.log("Starting Media Metadata Extractor...");
+  console.log(`Target Folder: ${path.resolve(imagesFolder)}`);
+  console.log(`Output Excel: ${path.resolve(outputExcel)}`);
+  console.log(`Concurrent Tasks: ${concurrent}`);
 
   if (!fs.existsSync(imagesFolder)) {
-    onLog({ type: "error", message: `Folder not found: ${imagesFolder}` });
+    console.error(`Folder not found: ${imagesFolder}`);
     return { success: false, message: "Folder not found" };
   }
 
@@ -64,14 +52,7 @@ export async function extractMetadata(
 
   const limit = pLimit(concurrent);
   const tasks: Promise<void>[] = [];
-  const rows: {
-    fileName: string;
-    title: string;
-    subject: string;
-    rating: number;
-    tags: string;
-    comments: string;
-  }[] = [];
+  const rows: Record<string, unknown>[] = [];
 
   for (const file of files) {
     const ext = path.extname(file).toLowerCase();
@@ -80,7 +61,7 @@ export async function extractMetadata(
     const filePath = path.join(imagesFolder, file);
 
     const task = limit(async () => {
-      onLog({ type: "info", message: `Reading metadata: ${file}` });
+      console.log(`Reading metadata: ${file}`);
 
       try {
         const tags = await exiftool.read(filePath);
@@ -97,10 +78,9 @@ export async function extractMetadata(
 
         processedCount++;
       } catch (err: unknown) {
-        onLog({
-          type: "warn",
-          message: `Could not read metadata for ${file}: ${(err as Error).message}`,
-        });
+        console.warn(
+          `Could not read metadata for ${file}: ${(err as Error).message}`,
+        );
 
         rows.push({
           fileName: file,
@@ -120,7 +100,9 @@ export async function extractMetadata(
   await Promise.all(tasks);
 
   // Sort for stable output
-  rows.sort((a, b) => a.fileName.localeCompare(b.fileName));
+  rows.sort((a, b) =>
+    (a.fileName as string).localeCompare(b.fileName as string),
+  );
 
   // Write to Excel (safe)
   for (const row of rows) {
@@ -129,16 +111,12 @@ export async function extractMetadata(
 
   try {
     await workbook.xlsx.writeFile(outputExcel);
-    onLog({
-      type: "success",
-      message: `Successfully exported ${processedCount} files to ${outputExcel}`,
-    });
+    console.log(
+      `Successfully exported ${processedCount} files to ${outputExcel}`,
+    );
     return { success: true, message: "Extraction completed", processedCount };
   } catch (error: unknown) {
-    onLog({
-      type: "error",
-      message: `Failed to save Excel file: ${(error as Error).message}`,
-    });
+    console.error(`Failed to save Excel file: ${(error as Error).message}`);
     return { success: false, message: "Failed to save Excel file" };
   } finally {
     await exiftool.end();

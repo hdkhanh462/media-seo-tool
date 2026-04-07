@@ -8,6 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src/mainview"),
+      "~": path.resolve(__dirname, "./src"),
     },
   },
   root: "src/mainview",

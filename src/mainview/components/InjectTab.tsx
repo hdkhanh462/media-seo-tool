@@ -10,19 +10,14 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  type InjectOptions,
-  injectMetadata,
-  type LogEntry,
-} from "../services/injectService";
+import { injectMetadata } from "@/services/mediaRpcClient";
 
 export function InjectTab() {
   const [imagesFolder, setImagesFolder] = useState("./my_files");
   const [excelFile, setExcelFile] = useState("data.xlsx");
   const [concurrent, setConcurrent] = useState(5);
-  const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isRunning, setIsRunning] = useState(false);
+  const [result, setResult] = useState<string>("");
 
   const handleFolderSelect = () => {
     const input = document.createElement("input");
@@ -53,17 +48,10 @@ export function InjectTab() {
 
   const handleRun = async () => {
     setIsRunning(true);
-    setLogs([]);
+    setResult("");
 
-    const options: InjectOptions = {
-      imagesFolder,
-      excelFile,
-      concurrent,
-    };
-
-    await injectMetadata(options, (log) => {
-      setLogs((prev) => [...prev, log]);
-    });
+    const res = await injectMetadata(imagesFolder, excelFile, concurrent);
+    setResult(res.message);
 
     setIsRunning(false);
   };
@@ -126,15 +114,12 @@ export function InjectTab() {
           {isRunning ? "Injecting..." : "Start Injection"}
         </Button>
         <div className="space-y-2">
-          <Label>Logs</Label>
-          <Textarea
-            readOnly
-            value={logs
-              .map((log) => `[${log.type.toUpperCase()}] ${log.message}`)
-              .join("\n")}
-            className="h-40 font-mono text-sm"
-            placeholder="Logs will appear here..."
-          />
+          <Label>Result</Label>
+          <div className="rounded-md bg-muted p-4">
+            <p className="text-sm">
+              {result || "Click 'Start Injection' to begin"}
+            </p>
+          </div>
         </div>
       </CardContent>
     </Card>

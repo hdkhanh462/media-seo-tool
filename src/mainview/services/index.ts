@@ -1,7 +1,7 @@
 import { Electroview } from "electrobun/view";
-import type { MyWebviewRPCType } from "~/shared/types";
+import type { MainWebviewRPCType } from "~/shared/types";
 
-const rpc = Electroview.defineRPC<MyWebviewRPCType>({
+const rpc = Electroview.defineRPC<MainWebviewRPCType>({
   handlers: {
     requests: {
       someWebviewFunction: ({ a, b }) => {
@@ -19,7 +19,3 @@ const rpc = Electroview.defineRPC<MyWebviewRPCType>({
 });
 
 export const electroview = new Electroview({ rpc });
-
-electroview.rpc?.request.someBunFunction({ a: 9, b: 8 }).then((result) => {
-  console.log("result: ", result);
-});

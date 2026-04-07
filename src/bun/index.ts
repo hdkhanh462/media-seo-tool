@@ -1,6 +1,7 @@
 import { BrowserView, BrowserWindow, Updater } from "electrobun/bun";
-import { Electroview } from "electrobun/view";
-import type { MyWebviewRPCType } from "~/shared/types";
+import type { MainWebviewRPCType } from "~/shared/types";
+import { extractMetadata as bunExtractMetadata } from "./services/extractService";
+import { injectMetadata as bunInjectMetadata } from "./services/injectService";
 
 const DEV_SERVER_PORT = 5173;
 const DEV_SERVER_URL = `http://localhost:${DEV_SERVER_PORT}`;
@@ -26,10 +27,16 @@ async function getMainViewUrl(): Promise<string> {
 const url = await getMainViewUrl();
 
 // Create an RPC object for the bun handlers with the shared type
-const mainWebviewRPC = BrowserView.defineRPC<MyWebviewRPCType>({
-  maxRequestTime: 5000,
+const mainWebviewRPC = BrowserView.defineRPC<MainWebviewRPCType>({
+  maxRequestTime: 30000, // increased timeout for file operations
   handlers: {
     requests: {
+      extractMetadata: async (params) => {
+        return bunExtractMetadata(params);
+      },
+      injectMetadata: async (params) => {
+        return bunInjectMetadata(params);
+      },
       someBunFunction: ({ a, b }) => {
         console.log(`browser asked me to do math with: ${a} and ${b}`);
         return a + b;
