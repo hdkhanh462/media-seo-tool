@@ -1,5 +1,15 @@
 import type { RPCSchema } from "electrobun";
 
+export interface ExtractOptions {
+  imagesFolder: string;
+  outputExcel: string;
+}
+
+export interface InjectOptions {
+  imagesFolder: string;
+  excelFile: string;
+}
+
 export type ExtractResult = {
   success: boolean;
   message: string;

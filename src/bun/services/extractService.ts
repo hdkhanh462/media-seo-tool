@@ -1,25 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import ExcelJS from "exceljs";
-import { ExifTool } from "exiftool-vendored";
+import type { ExtractOptions, ExtractResult } from "~/shared/types";
 
-import { getExif } from "../../old-cli/utils";
-
-// Helper to get a fresh exiftool instance
-function getExiftoolInstance() {
-  return new ExifTool();
-}
-
-export interface ExtractOptions {
-  imagesFolder: string;
-  outputExcel: string;
-}
-
-export interface ExtractResult {
-  success: boolean;
-  message: string;
-  processedCount?: number;
-}
+import { getExiftoolInstance } from "../lib/exiftool-vendored";
+import { getExif } from "../utils";
 
 export async function extractMetadata(
   options: ExtractOptions,

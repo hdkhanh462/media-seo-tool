@@ -1,16 +1,5 @@
-import { createInterface } from "node:readline";
 import type ExcelJS from "exceljs";
 import type { Tags } from "exiftool-vendored";
-
-export const pause = () => {
-  const rl = createInterface({ input: process.stdin, output: process.stdout });
-  return new Promise((resolve) =>
-    rl.question("\nPress Enter to exit...", (ans) => {
-      rl.close();
-      resolve(ans);
-    }),
-  );
-};
 
 export const getRowData = (row: ExcelJS.Row) => {
   const title = row.getCell(2).text?.trim() || "";

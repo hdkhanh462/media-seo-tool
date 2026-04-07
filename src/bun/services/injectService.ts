@@ -1,26 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import ExcelJS from "exceljs";
-import { ExifTool } from "exiftool-vendored";
+import type { InjectOptions, InjectResult } from "~/shared/types";
 
-import { getRowData } from "../../old-cli/utils";
-
-// Helper to get a fresh exiftool instance
-function getExiftoolInstance() {
-  return new ExifTool();
-}
-
-export interface InjectOptions {
-  imagesFolder: string;
-  excelFile: string;
-}
-
-export interface InjectResult {
-  success: boolean;
-  message: string;
-  successCount?: number;
-  failCount?: number;
-}
+import { getExiftoolInstance } from "../lib/exiftool-vendored";
+import { getRowData } from "../utils";
 
 export async function injectMetadata(
   options: InjectOptions,
