@@ -56,13 +56,6 @@ export type MainWebviewRPCType = {
         params: undefined;
         response: HistoryData;
       };
-      someBunFunction: {
-        params: {
-          a: number;
-          b: number;
-        };
-        response: number;
-      };
     };
     messages: {
       logToBun: {
@@ -72,15 +65,6 @@ export type MainWebviewRPCType = {
   }>;
   // functions that execute in the browser context
   webview: RPCSchema<{
-    requests: {
-      someWebviewFunction: {
-        params: {
-          a: number;
-          b: number;
-        };
-        response: number;
-      };
-    };
     messages: {
       logToWebview: {
         msg: string;

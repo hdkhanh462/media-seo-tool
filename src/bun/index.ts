@@ -86,10 +86,6 @@ const mainWebviewRPC = BrowserView.defineRPC<MainWebviewRPCType>({
       loadHistory: async () => {
         return loadHistory();
       },
-      someBunFunction: ({ a, b }) => {
-        console.log(`browser asked me to do math with: ${a} and ${b}`);
-        return a + b;
-      },
     },
     // When the browser sends a message we can handle it
     // in the main bun process
