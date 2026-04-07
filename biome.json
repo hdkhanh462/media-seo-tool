@@ -28,7 +28,8 @@
       "!**/convex/_generated",
       "!**/components/ui",
       "!**/ui/src/components",
-      "!**/*.d.ts"
+      "!**/*.d.ts",
+      "!**/old-cli/*.ts"
     ]
   },
   "formatter": {

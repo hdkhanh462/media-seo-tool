@@ -1,4 +1,6 @@
-import { BrowserWindow, Updater } from "electrobun/bun";
+import { BrowserView, BrowserWindow, Updater } from "electrobun/bun";
+import { Electroview } from "electrobun/view";
+import type { MyWebviewRPCType } from "~/shared/types";
 
 const DEV_SERVER_PORT = 5173;
 const DEV_SERVER_URL = `http://localhost:${DEV_SERVER_PORT}`;
@@ -23,8 +25,31 @@ async function getMainViewUrl(): Promise<string> {
 // Create the main application window
 const url = await getMainViewUrl();
 
+// Create an RPC object for the bun handlers with the shared type
+const mainWebviewRPC = BrowserView.defineRPC<MyWebviewRPCType>({
+  maxRequestTime: 5000,
+  handlers: {
+    requests: {
+      someBunFunction: ({ a, b }) => {
+        console.log(`browser asked me to do math with: ${a} and ${b}`);
+        return a + b;
+      },
+    },
+    // When the browser sends a message we can handle it
+    // in the main bun process
+    messages: {
+      "*": (messageName, payload) => {
+        console.log("global message handler", messageName, payload);
+      },
+      logToBun: ({ msg }) => {
+        console.log("Log to bun: ", msg);
+      },
+    },
+  },
+});
+
 const _mainWindow = new BrowserWindow({
-  title: "React + Tailwind + Vite",
+  title: "Media SEO Tool",
   url,
   frame: {
     width: 900,
@@ -32,6 +57,7 @@ const _mainWindow = new BrowserWindow({
     x: 200,
     y: 200,
   },
+  rpc: mainWebviewRPC,
 });
 
-console.log("React Tailwind Vite app started!");
+console.log("Media SEO Tool started!");

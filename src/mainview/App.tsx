@@ -1,33 +1,90 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ExtractTab } from "./components/ExtractTab";
+import { InjectTab } from "./components/InjectTab";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <div className="min-h-screen">
-      <div className="container mx-auto max-w-3xl px-4 py-10">
-        <h1 className="mb-2 text-center font-bold text-5xl drop-shadow-lg">
-          React + Tailwind + Vite
-        </h1>
-        <p className="mb-10 text-center text-xl">
-          A fast Electrobun app with hot module replacement
-        </p>
-
-        <div className="mb-8 rounded-xl p-8 shadow-xl">
-          <h2 className="mb-4 font-semibold text-2xl">Interactive Counter</h2>
-          <p className="mb-4 text-muted-foreground">
-            Click the button below to test React state. With HMR enabled, you
-            can edit this component and see changes instantly without losing
-            state.
-          </p>
-          <div className="flex items-center gap-4">
-            <Button onClick={() => setCount((c) => c + 1)}>
-              Count: {count}
-            </Button>
-            <Button onClick={() => setCount(0)}>Reset</Button>
-          </div>
-        </div>
+      <div className="container mx-auto md:px-4">
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+            <TabsTrigger value="extract">Extract</TabsTrigger>
+            <TabsTrigger value="inject">Inject</TabsTrigger>
+          </TabsList>
+          <TabsContent value="overview">
+            <Card>
+              <CardHeader>
+                <CardTitle>Overview</CardTitle>
+                <CardDescription>
+                  View your key metrics and recent project activity. Track
+                  progress across all your active projects.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-muted-foreground text-sm">
+                You have 12 active projects and 3 pending tasks.
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="analytics">
+            <Card>
+              <CardHeader>
+                <CardTitle>Analytics</CardTitle>
+                <CardDescription>
+                  Track performance and user engagement metrics. Monitor trends
+                  and identify growth opportunities.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-muted-foreground text-sm">
+                Page views are up 25% compared to last month.
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="reports">
+            <Card>
+              <CardHeader>
+                <CardTitle>Reports</CardTitle>
+                <CardDescription>
+                  Generate and download your detailed reports. Export data in
+                  multiple formats for analysis.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-muted-foreground text-sm">
+                You have 5 reports ready and available to export.
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="settings">
+            <Card>
+              <CardHeader>
+                <CardTitle>Settings</CardTitle>
+                <CardDescription>
+                  Manage your account preferences and options. Customize your
+                  experience to fit your needs.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-muted-foreground text-sm">
+                Configure notifications, security, and themes.
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="extract">
+            <ExtractTab />
+          </TabsContent>
+          <TabsContent value="inject">
+            <InjectTab />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
