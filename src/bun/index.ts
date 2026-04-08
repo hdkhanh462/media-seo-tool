@@ -110,6 +110,7 @@ const _mainWindow = new BrowserWindow({
     y: 200,
   },
   rpc: mainWebviewRPC,
+  titleBarStyle: "hidden",
 });
 
 console.log("Media SEO Tool started!");

@@ -35,6 +35,28 @@ export type HistoryData = {
   lastUsed?: string;
 };
 
+export type FileWithExif = {
+  name: string;
+  size: number;
+  type: string;
+  lastModified: number;
+  exif: {
+    title?: string;
+    description?: string;
+    keywords?: string[];
+    rating?: number;
+    author?: string;
+    license?: string;
+    geo?: {
+      latitude?: number;
+      longitude?: number;
+    };
+
+    // Allow for additional EXIF fields that we might not have explicitly defined
+    [key: string]: unknown;
+  };
+};
+
 export type MainWebviewRPCType = {
   // functions that execute in the main process
   bun: RPCSchema<{

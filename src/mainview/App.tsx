@@ -1,34 +1,18 @@
-import { useState } from "react";
-import { ExtractTab } from "@/components/ExtractTab";
-import { InjectTab } from "@/components/InjectTab";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SidebarInset } from "@/components/ui/sidebar";
 
 function App() {
-  const [activeTab, setActiveTab] = useState("inject");
-
   return (
-    <div className="min-h-screen">
-      <div className="container mx-auto md:px-4">
-        <Tabs
-          defaultValue="overview"
-          className="w-full"
-          value={activeTab}
-          onValueChange={setActiveTab}
-        >
-          <TabsList>
-            <TabsTrigger value="inject">Inject</TabsTrigger>
-            <TabsTrigger value="extract">Extract</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="inject">
-            <InjectTab />
-          </TabsContent>
-          <TabsContent value="extract">
-            <ExtractTab />
-          </TabsContent>
-        </Tabs>
+    <SidebarInset>
+      <div className="flex max-h-screen flex-1 flex-col gap-4 overflow-y-scroll p-4">
+        <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+          <div className="aspect-video rounded-xl bg-muted/50" />
+          <div className="aspect-video rounded-xl bg-muted/50" />
+          <div className="aspect-video rounded-xl bg-muted/50" />
+        </div>
+        <div className="min-h-screen flex-1 rounded-xl bg-muted/50" />
+        <div className="min-h-screen flex-1 rounded-xl bg-muted/50" />
       </div>
-    </div>
+    </SidebarInset>
   );
 }
 
