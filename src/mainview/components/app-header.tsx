@@ -1,14 +1,22 @@
 "use client";
 
-import { MaximizeIcon, MinusIcon, SidebarIcon, XIcon } from "lucide-react";
+import {
+  MaximizeIcon,
+  MinimizeIcon,
+  MinusIcon,
+  SidebarIcon,
+  XIcon,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useTitleBar } from "@/hooks/useTitleBar";
+import { useAppStore } from "@/store/useAppStore";
 
 export function AppHeader() {
   const { toggleSidebar } = useSidebar();
   const { closeWindow, minimizeWindow, toggleMaximizeWindow } = useTitleBar();
+  const isMaximized = useAppStore((state) => state.isMaximized);
 
   return (
     <div
@@ -25,7 +33,7 @@ export function AppHeader() {
             <MinusIcon />
           </Button>
           <Button variant="ghost" size="icon-sm" onClick={toggleMaximizeWindow}>
-            <MaximizeIcon />
+            {isMaximized ? <MinimizeIcon /> : <MaximizeIcon />}
           </Button>
           <Button
             variant="ghost-destructive"

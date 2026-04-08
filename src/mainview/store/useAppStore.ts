@@ -11,7 +11,7 @@ interface AppState {
 
 export const useAppStore = create<AppState>((set) => ({
   activeContent: "editor",
-  isMaximized: false,
+  isMaximized: true,
   setActiveContent: (content) => set({ activeContent: content }),
-  toggleIsMaximized: () => set((prev) => ({ isMaximized: !prev })),
+  toggleIsMaximized: () => set((prev) => ({ isMaximized: !prev.isMaximized })),
 }));
