@@ -1,8 +1,6 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { RefreshCcw } from "lucide-react";
-import { Controller, useForm } from "react-hook-form";
+import { RefreshCcwIcon, StarIcon } from "lucide-react";
+import { Controller, UseFormReturn } from "react-hook-form";
 
-import { Button } from "@/components/ui/button";
 import {
   Field,
   FieldDescription,
@@ -10,7 +8,12 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { NumberInput } from "@/components/ui/number-input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+} from "@/components/ui/input-group";
+import { Rating, RatingItem } from "@/components/ui/rating";
 import {
   TagsInput,
   TagsInputClear,
@@ -19,29 +22,14 @@ import {
   TagsInputList,
 } from "@/components/ui/tags-input";
 import { Textarea } from "@/components/ui/textarea";
-import { exifFormSchema } from "@/schemas/exif.schema";
 import type { ExifFormValues } from "@/types/exif.types";
 
-export const ExifForm = ({
-  defaultValues,
-  onSubmitData,
-}: {
-  defaultValues?: Partial<ExifFormValues>;
+type Props = {
+  form: UseFormReturn<ExifFormValues>;
   onSubmitData?: (data: ExifFormValues) => void;
-}) => {
-  const form = useForm<ExifFormValues>({
-    resolver: zodResolver(exifFormSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      keywords: [],
-      rating: 0,
-      author: "",
-      license: "",
-      ...defaultValues,
-    },
-  });
+};
 
+export const ExifForm: React.FC<Props> = ({ form, onSubmitData }) => {
   function onSubmit(data: ExifFormValues) {
     onSubmitData?.(data);
   }
@@ -49,21 +37,21 @@ export const ExifForm = ({
   return (
     <form
       onSubmit={form.handleSubmit(onSubmit)}
-      className="space-y-6 max-w-2xl"
+      className="space-y-4 max-w-full p-4"
     >
       <Controller
         name="title"
         control={form.control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={field.name}>Title</FieldLabel>
+            <FieldLabel htmlFor={field.name}>Title (Title/Headline)</FieldLabel>
             <Input
               {...field}
               id={field.name}
               aria-invalid={fieldState.invalid}
-              placeholder="Title"
+              placeholder="Enter title..."
             />
-            <FieldDescription>Document title.</FieldDescription>
+            <FieldDescription>Title of the media</FieldDescription>
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
@@ -79,7 +67,7 @@ export const ExifForm = ({
               {...field}
               id={field.name}
               aria-invalid={fieldState.invalid}
-              placeholder="Description"
+              placeholder="Enter description..."
             />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
@@ -91,56 +79,87 @@ export const ExifForm = ({
         control={form.control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="tags-input-keywords">
+              Keywords (Keywords/Tags)
+            </FieldLabel>
             <TagsInput
               value={field.value}
               onValueChange={field.onChange}
               editable
               addOnPaste
             >
-              <FieldLabel htmlFor="tags-input-keywords">Keywords</FieldLabel>
-              <TagsInputList>
-                {field.value?.map((keyword) => (
-                  <TagsInputItem key={keyword} value={keyword}>
-                    {keyword}
-                  </TagsInputItem>
-                ))}
-                <TagsInputInput
-                  id="tags-input-keywords"
-                  placeholder="Add keyword..."
-                  aria-invalid={fieldState.invalid}
-                />
-              </TagsInputList>
-              <TagsInputClear asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  type="button"
-                  className="mt-2"
-                >
-                  <RefreshCcw className="h-4 w-4 mr-2" />
-                  Clear
-                </Button>
-              </TagsInputClear>
+              <InputGroup className="min-h-10 h-auto has-[[data-slot=tags-input-input]:focus-visible]:border-ring has-[[data-slot=tags-input-input]:focus-visible]:ring-3 has-[[data-slot=tags-input-input]:focus-visible]:ring-ring/50">
+                <TagsInputList className="bg-transparent border-none ring-0 focus-within:ring-0">
+                  {field.value?.map((keyword) => (
+                    <TagsInputItem key={keyword} value={keyword}>
+                      {keyword}
+                    </TagsInputItem>
+                  ))}
+                  <TagsInputInput
+                    id="tags-input-keywords"
+                    placeholder="Add keyword..."
+                    aria-invalid={fieldState.invalid}
+                  />
+                </TagsInputList>
+                <InputGroupAddon align="inline-end">
+                  <TagsInputClear asChild>
+                    <InputGroupButton
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label="Clear keywords"
+                    >
+                      <RefreshCcwIcon />
+                    </InputGroupButton>
+                  </TagsInputClear>
+                </InputGroupAddon>
+              </InputGroup>
             </TagsInput>
-            <FieldDescription>
-              Keywords related to the document.
-            </FieldDescription>
+            <FieldDescription>Keyworlds of the media</FieldDescription>
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
       />
 
-      <Controller
-        name="rating"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={field.name}>Rating (0-5)</FieldLabel>
-            <NumberInput {...field} />
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
-        )}
-      />
+      <div className="grid grid-cols-6 gap-4">
+        <Controller
+          name="subject"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="col-span-4">
+              <FieldLabel htmlFor={field.name}>Subject</FieldLabel>
+              <Input
+                {...field}
+                id={field.name}
+                aria-invalid={fieldState.invalid}
+                placeholder="Enter subject..."
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Controller
+          name="rating"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="col-span-2">
+              <FieldLabel htmlFor={field.name}>Rating</FieldLabel>
+              <Rating
+                value={field.value}
+                onValueChange={field.onChange}
+                className="gap-1 text-yellow-500 h-9"
+              >
+                {Array.from({ length: 5 }, (_, i) => (
+                  <RatingItem key={i}>
+                    <StarIcon />
+                  </RatingItem>
+                ))}
+              </Rating>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+      </div>
 
       <div className="grid grid-cols-2 gap-4">
         <Controller
@@ -153,7 +172,7 @@ export const ExifForm = ({
                 {...field}
                 id={field.name}
                 aria-invalid={fieldState.invalid}
-                placeholder="Author name"
+                placeholder="Enter author..."
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
@@ -169,15 +188,13 @@ export const ExifForm = ({
                 {...field}
                 id={field.name}
                 aria-invalid={fieldState.invalid}
-                placeholder="License (e.g., Copyright)"
+                placeholder="Enter license..."
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
       </div>
-
-      <Button type="submit">Submit</Button>
     </form>
   );
 };

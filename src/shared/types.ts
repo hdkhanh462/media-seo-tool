@@ -1,3 +1,4 @@
+import { ExifFormValues } from "@/types/exif.types";
 import type { RPCSchema } from "electrobun";
 
 export interface ExtractOptions {
@@ -35,26 +36,12 @@ export type HistoryData = {
   lastUsed?: string;
 };
 
-export type FileWithExif = {
+export type MediaWithExif = {
   name: string;
   size: number;
   type: string;
   lastModified: number;
-  exif: {
-    title?: string;
-    description?: string;
-    keywords?: string[];
-    rating?: number;
-    author?: string;
-    license?: string;
-    geo?: {
-      latitude?: number;
-      longitude?: number;
-    };
-
-    // Allow for additional EXIF fields that we might not have explicitly defined
-    [key: string]: unknown;
-  };
+  exif: ExifFormValues;
 };
 
 export type MainWebviewRPCType = {

@@ -26,6 +26,7 @@ export function AppHeader() {
         <Button size="icon-sm">
           <GalleryVerticalEndIcon />
         </Button>
+        <h1 className="font-semibold">Media SEO Tool</h1>
         <div className="electrobun-webkit-app-region-no-drag ml-auto flex items-center gap-2">
           <Button variant="ghost" size="icon-sm" onClick={minimizeWindow}>
             <MinusIcon />
