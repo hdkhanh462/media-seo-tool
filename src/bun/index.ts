@@ -1,38 +1,20 @@
 import path from "node:path";
-import { BrowserView, BrowserWindow, Updater } from "electrobun/bun";
+import { BrowserView, BrowserWindow, Screen } from "electrobun/bun";
 import type { MainWebviewRPCType } from "~/shared/types";
 import { extractMetadata as bunExtractMetadata } from "./services/extractService";
 import { loadHistory, updateHistory } from "./services/historyService";
 import { injectMetadata as bunInjectMetadata } from "./services/injectService";
 import { openFileDialog } from "./services/inputService";
+import { getCenterPosition, getMainViewUrl } from "./utils/window";
 
-export interface OpenFileDialogOptions {
-  canChooseDirectory?: boolean;
-  canChooseFiles?: boolean;
-  allowsMultipleSelection?: boolean;
-  directoryURL?: string;
-  allowedFileTypes?: string[];
-}
-
-const DEV_SERVER_PORT = 5173;
-const DEV_SERVER_URL = `http://localhost:${DEV_SERVER_PORT}`;
-
-// Check if Vite dev server is running for HMR
-async function getMainViewUrl(): Promise<string> {
-  const channel = await Updater.localInfo.channel();
-  if (channel === "dev") {
-    try {
-      await fetch(DEV_SERVER_URL, { method: "HEAD" });
-      console.log(`HMR enabled: Using Vite dev server at ${DEV_SERVER_URL}`);
-      return DEV_SERVER_URL;
-    } catch {
-      console.log(
-        "Vite dev server not running. Run 'bun run dev:hmr' for HMR support.",
-      );
-    }
-  }
-  return "views://mainview/index.html";
-}
+const WINDOW_WIDTH = 900;
+const WINDOW_HEIGHT = 600;
+let IS_MAXIMIZED = false;
+let PREV_BOUNDS = {
+  width: WINDOW_WIDTH,
+  height: WINDOW_HEIGHT,
+  ...getCenterPosition(WINDOW_WIDTH, WINDOW_HEIGHT),
+};
 
 // Create the main application window
 const url = await getMainViewUrl();
@@ -96,8 +78,27 @@ const mainWebviewRPC = BrowserView.defineRPC<MainWebviewRPCType>({
       closeWindow: () => mainWindow.close(),
       minimizeWindow: () => mainWindow.minimize(),
       maximizeWindow: () => {
-        if (mainWindow.isMaximized()) mainWindow.unmaximize();
-        else mainWindow.maximize();
+        if (IS_MAXIMIZED) {
+          // restore
+          mainWindow.setSize(PREV_BOUNDS.width, PREV_BOUNDS.height);
+          mainWindow.setPosition(PREV_BOUNDS.x, PREV_BOUNDS.y);
+        } else {
+          // save current
+          PREV_BOUNDS = {
+            width: mainWindow.getSize().width,
+            height: mainWindow.getSize().height,
+            x: mainWindow.getPosition().x,
+            y: mainWindow.getPosition().y,
+          };
+
+          // fake maximize
+          const { width, height } = Screen.getPrimaryDisplay().workArea;
+
+          mainWindow.setPosition(0, 0);
+          mainWindow.setSize(width, height);
+        }
+
+        IS_MAXIMIZED = !IS_MAXIMIZED;
       },
       logToBun: ({ msg }) => {
         console.log("Log to bun: ", msg);
@@ -109,12 +110,7 @@ const mainWebviewRPC = BrowserView.defineRPC<MainWebviewRPCType>({
 const mainWindow = new BrowserWindow({
   title: "Media SEO Tool",
   url,
-  frame: {
-    width: 900,
-    height: 600,
-    x: 200,
-    y: 200,
-  },
+  frame: PREV_BOUNDS,
   rpc: mainWebviewRPC,
   titleBarStyle: "hidden",
 });
