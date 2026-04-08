@@ -90,6 +90,9 @@ export type MainWebviewRPCType = {
       };
     };
     messages: {
+      closeWindow: undefined;
+      minimizeWindow: undefined;
+      maximizeWindow: undefined;
       logToBun: {
         msg: string;
       };

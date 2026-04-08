@@ -93,6 +93,12 @@ const mainWebviewRPC = BrowserView.defineRPC<MainWebviewRPCType>({
       "*": (messageName, payload) => {
         console.log("Global message handler", messageName, payload);
       },
+      closeWindow: () => mainWindow.close(),
+      minimizeWindow: () => mainWindow.minimize(),
+      maximizeWindow: () => {
+        if (mainWindow.isMaximized()) mainWindow.unmaximize();
+        else mainWindow.maximize();
+      },
       logToBun: ({ msg }) => {
         console.log("Log to bun: ", msg);
       },
@@ -100,7 +106,7 @@ const mainWebviewRPC = BrowserView.defineRPC<MainWebviewRPCType>({
   },
 });
 
-const _mainWindow = new BrowserWindow({
+const mainWindow = new BrowserWindow({
   title: "Media SEO Tool",
   url,
   frame: {
