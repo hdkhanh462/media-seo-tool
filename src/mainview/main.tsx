@@ -17,7 +17,7 @@ createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="max-h-screen overflow-hidden [--header-height:calc(--spacing(10))]">
-          <SidebarProvider className="flex flex-col">
+          <SidebarProvider className="flex flex-col" defaultOpen={false}>
             <AppHeader />
             <div className="flex flex-1">
               <SidebarLeft />

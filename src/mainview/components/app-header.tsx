@@ -20,7 +20,7 @@ export function AppHeader() {
 
   return (
     <div
-      role="banner"
+      role="menubar"
       className="electrobun-webkit-app-region-drag sticky top-0 z-50 flex w-full items-center border-b bg-background"
       onDoubleClick={toggleMaximizeWindow}
     >
