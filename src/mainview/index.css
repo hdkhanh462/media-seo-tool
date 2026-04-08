@@ -89,6 +89,11 @@
     @apply font-sans;
   }
 
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
   /* Custom Scrollbar */
   ::-webkit-scrollbar {
     @apply w-2;
