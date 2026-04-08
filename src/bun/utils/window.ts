@@ -1,4 +1,4 @@
-import { Screen, Updater } from "electrobun";
+import { type BrowserWindow, Screen, Updater } from "electrobun";
 
 const DEV_SERVER_PORT = 5173;
 const DEV_SERVER_URL = `http://localhost:${DEV_SERVER_PORT}`;
@@ -26,4 +26,9 @@ export const getCenterPosition = (width: number, height: number) => {
     x: Math.round((sw - width) / 2),
     y: Math.round((sh - height) / 2),
   };
+};
+
+export const fakeMaximize = (window: BrowserWindow) => {
+  const { width, height } = Screen.getPrimaryDisplay().workArea;
+  window.setFrame(0, 0, width, height);
 };

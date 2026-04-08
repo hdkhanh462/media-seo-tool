@@ -5,11 +5,15 @@ import { extractMetadata as bunExtractMetadata } from "./services/extractService
 import { loadHistory, updateHistory } from "./services/historyService";
 import { injectMetadata as bunInjectMetadata } from "./services/injectService";
 import { openFileDialog } from "./services/inputService";
-import { getCenterPosition, getMainViewUrl } from "./utils/window";
+import {
+  fakeMaximize,
+  getCenterPosition,
+  getMainViewUrl,
+} from "./utils/window";
 
 const WINDOW_WIDTH = 900;
 const WINDOW_HEIGHT = 600;
-let IS_MAXIMIZED = false;
+let IS_MAXIMIZED = true;
 let PREV_BOUNDS = {
   width: WINDOW_WIDTH,
   height: WINDOW_HEIGHT,
@@ -77,25 +81,24 @@ const mainWebviewRPC = BrowserView.defineRPC<MainWebviewRPCType>({
       },
       closeWindow: () => mainWindow.close(),
       minimizeWindow: () => mainWindow.minimize(),
-      maximizeWindow: () => {
+      toggleMaximizeWindow: () => {
         if (IS_MAXIMIZED) {
           // restore
           mainWindow.setSize(PREV_BOUNDS.width, PREV_BOUNDS.height);
           mainWindow.setPosition(PREV_BOUNDS.x, PREV_BOUNDS.y);
         } else {
           // save current
+          const { width, height } = mainWindow.getSize();
+          const { x, y } = mainWindow.getPosition();
+
           PREV_BOUNDS = {
-            width: mainWindow.getSize().width,
-            height: mainWindow.getSize().height,
-            x: mainWindow.getPosition().x,
-            y: mainWindow.getPosition().y,
+            width,
+            height,
+            x,
+            y,
           };
 
-          // fake maximize
-          const { width, height } = Screen.getPrimaryDisplay().workArea;
-
-          mainWindow.setPosition(0, 0);
-          mainWindow.setSize(width, height);
+          fakeMaximize(mainWindow);
         }
 
         IS_MAXIMIZED = !IS_MAXIMIZED;
@@ -107,10 +110,17 @@ const mainWebviewRPC = BrowserView.defineRPC<MainWebviewRPCType>({
   },
 });
 
+const { width, height } = Screen.getPrimaryDisplay().workArea;
+
 const mainWindow = new BrowserWindow({
   title: "Media SEO Tool",
   url,
-  frame: PREV_BOUNDS,
+  frame: {
+    width,
+    height,
+    x: 0,
+    y: 0,
+  },
   rpc: mainWebviewRPC,
   titleBarStyle: "hidden",
 });

@@ -92,7 +92,7 @@ export type MainWebviewRPCType = {
     messages: {
       closeWindow: undefined;
       minimizeWindow: undefined;
-      maximizeWindow: undefined;
+      toggleMaximizeWindow: undefined;
       logToBun: {
         msg: string;
       };
