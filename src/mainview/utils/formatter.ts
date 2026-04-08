@@ -1,0 +1,24 @@
+import { SizeUnit } from "@/types/formatter";
+
+export const SIZE_UNITS: SizeUnit[] = ["Bytes", "KB", "MB", "GB", "TB", "PB"];
+
+type BytesToSizeReturn = {
+  value: number;
+  unit: SizeUnit;
+  label: string;
+};
+
+export const bytesToSize = (bytes: number, decimals = 2): BytesToSizeReturn => {
+  if (bytes === 0) return { value: 0, unit: "Bytes", label: "0 Bytes" };
+
+  const k = 1024;
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  const value = parseFloat((bytes / Math.pow(k, i)).toFixed(decimals));
+
+  return {
+    value,
+    unit: SIZE_UNITS[i],
+    label: `${value} ${SIZE_UNITS[i]}`,
+  };
+};
