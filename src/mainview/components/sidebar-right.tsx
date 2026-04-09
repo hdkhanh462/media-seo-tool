@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon } from "lucide-react";
-import type * as React from "react";
 import { useForm } from "react-hook-form";
 
 import { ExifForm } from "@/components/ExifForm";
@@ -15,6 +14,7 @@ import {
 import { ExifFormSchema } from "@/schemas/exif.schema";
 import { useAppStore } from "@/store/useAppStore";
 import type { ExifFormValues } from "@/types/exif.types";
+import { useEffect } from "react";
 
 export function SidebarRight({
   ...props
@@ -35,6 +35,21 @@ export function SidebarRight({
     },
   });
 
+  useEffect(() => {
+    if (selectedMedia) {
+      form.reset({
+        title: "",
+        description: "",
+        keywords: [],
+        subject: "",
+        rating: 0,
+        author: "",
+        license: "",
+        ...selectedMedia.exif,
+      });
+    }
+  }, [selectedMedia, form]);
+
   return (
     <Sidebar
       collapsible="none"
@@ -42,15 +57,13 @@ export function SidebarRight({
       {...props}
     >
       <SidebarHeader className="border-sidebar-border border-b px-4">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between gap-2">
           <h2 className="font-semibold">Edit Exif</h2>
-          {selectedMedia && (
-            <Badge variant="secondary">{selectedMedia.name}</Badge>
-          )}
+          {selectedMedia && <Badge>{selectedMedia.name}</Badge>}
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <ExifForm form={form} />
+        <ExifForm form={form} disabled={!selectedMedia} />
       </SidebarContent>
       <SidebarFooter className="p-4">
         <div className="grid grid-cols-2 gap-4">
@@ -58,7 +71,7 @@ export function SidebarRight({
             type="button"
             variant="outline"
             onClick={() => form.reset()}
-            disabled={form.formState.isSubmitting}
+            disabled={form.formState.isSubmitting || !form.formState.isDirty}
           >
             Reset
           </Button>

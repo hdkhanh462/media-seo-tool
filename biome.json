@@ -29,7 +29,8 @@
       "!**/components/ui",
       "!**/ui/src/components",
       "!**/*.d.ts",
-      "!**/old-cli/*.ts"
+      "!**/old-cli/*.ts",
+      "!**/out/**/*.tsx"
     ]
   },
   "formatter": {

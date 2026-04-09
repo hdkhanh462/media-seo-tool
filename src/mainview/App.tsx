@@ -6,7 +6,7 @@ import { SidebarInset } from "@/components/ui/sidebar";
 function App() {
   return (
     <SidebarInset>
-      <div className="flex max-h-[calc(100vh-var(--header-height))] flex-1 flex-col gap-4 overflow-y-auto p-4">
+      <div className="max-w-[calc(100vw-var(--container-md))] flex max-h-[calc(100vh-var(--header-height))] flex-1 flex-col gap-4 overflow-y-auto p-4">
         <AppContent value="editor">
           <EditorContainer />
         </AppContent>

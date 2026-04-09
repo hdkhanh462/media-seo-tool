@@ -96,7 +96,7 @@
 
   /* Custom Scrollbar */
   ::-webkit-scrollbar {
-    @apply w-2;
+    @apply size-2;
   }
   ::-webkit-scrollbar-track {
     @apply bg-transparent my-1;

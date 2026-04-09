@@ -1,3 +1,9 @@
+import { MediaTableDemo } from "@/components/media-table/media-table-demo";
+
 export const EditorContainer = () => {
-  return <div>EditorContainer</div>;
+  return (
+    <div>
+      <MediaTableDemo />
+    </div>
+  );
 };

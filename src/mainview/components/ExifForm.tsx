@@ -1,12 +1,7 @@
 import { RefreshCcwIcon, StarIcon } from "lucide-react";
 import { Controller, type UseFormReturn } from "react-hook-form";
 
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   InputGroup,
@@ -26,10 +21,11 @@ import type { ExifFormValues } from "@/types/exif.types";
 
 type Props = {
   form: UseFormReturn<ExifFormValues>;
+  disabled?: boolean;
   onSubmitData?: (data: ExifFormValues) => void;
 };
 
-export const ExifForm: React.FC<Props> = ({ form, onSubmitData }) => {
+export const ExifForm: React.FC<Props> = ({ form, disabled, onSubmitData }) => {
   function onSubmit(data: ExifFormValues) {
     onSubmitData?.(data);
   }
@@ -50,8 +46,8 @@ export const ExifForm: React.FC<Props> = ({ form, onSubmitData }) => {
               id={field.name}
               aria-invalid={fieldState.invalid}
               placeholder="Enter title..."
+              disabled={disabled}
             />
-            <FieldDescription>Title of the media</FieldDescription>
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
@@ -68,6 +64,7 @@ export const ExifForm: React.FC<Props> = ({ form, onSubmitData }) => {
               id={field.name}
               aria-invalid={fieldState.invalid}
               placeholder="Enter description..."
+              disabled={disabled}
             />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
@@ -85,6 +82,7 @@ export const ExifForm: React.FC<Props> = ({ form, onSubmitData }) => {
             <TagsInput
               value={field.value}
               onValueChange={field.onChange}
+              disabled={disabled}
               editable
               addOnPaste
             >
@@ -115,7 +113,6 @@ export const ExifForm: React.FC<Props> = ({ form, onSubmitData }) => {
                 </InputGroupAddon>
               </InputGroup>
             </TagsInput>
-            <FieldDescription>Keyworlds of the media</FieldDescription>
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
@@ -133,6 +130,7 @@ export const ExifForm: React.FC<Props> = ({ form, onSubmitData }) => {
                 id={field.name}
                 aria-invalid={fieldState.invalid}
                 placeholder="Enter subject..."
+                disabled={disabled}
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
@@ -148,6 +146,7 @@ export const ExifForm: React.FC<Props> = ({ form, onSubmitData }) => {
                 value={field.value}
                 onValueChange={field.onChange}
                 className="h-9 gap-1 text-yellow-500"
+                disabled={disabled}
               >
                 {Array.from({ length: 5 }, (_, i) => (
                   <RatingItem key={i}>
@@ -173,6 +172,7 @@ export const ExifForm: React.FC<Props> = ({ form, onSubmitData }) => {
                 id={field.name}
                 aria-invalid={fieldState.invalid}
                 placeholder="Enter author..."
+                disabled={disabled}
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
@@ -189,6 +189,7 @@ export const ExifForm: React.FC<Props> = ({ form, onSubmitData }) => {
                 id={field.name}
                 aria-invalid={fieldState.invalid}
                 placeholder="Enter license..."
+                disabled={disabled}
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
