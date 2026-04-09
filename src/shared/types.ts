@@ -44,6 +44,15 @@ export type MediaWithExif = {
   exif: ExifFormValues;
 };
 
+export type MedialInFolderResult = {
+  rows: MediaWithExif[];
+  counter: {
+    total: number;
+    success: number;
+    failed: number;
+  };
+};
+
 export type MainWebviewRPCType = {
   // functions that execute in the main process
   bun: RPCSchema<{
@@ -77,7 +86,7 @@ export type MainWebviewRPCType = {
       };
       getMedialInFolder: {
         params: { folderPath: string };
-        response: MediaWithExif[];
+        response: MedialInFolderResult;
       };
       checkFileExists: {
         params: { filePath: string };

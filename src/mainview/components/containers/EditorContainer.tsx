@@ -94,7 +94,7 @@ export const EditorContainer = () => {
 
   useEffect(() => {
     if (activeTab === "media") {
-      const index = mediaInFolder.data?.findIndex(
+      const index = mediaInFolder.data?.rows.findIndex(
         (media) => media.name === selectedMedia?.name,
       );
       setMediaRowSelection(
@@ -132,7 +132,7 @@ export const EditorContainer = () => {
   const handleMediaRowSelectionChange = (
     updater: Updater<RowSelectionState>,
   ) => {
-    updateSelectRow(updater, mediaRowSelection, mediaInFolder.data || []);
+    updateSelectRow(updater, mediaRowSelection, mediaInFolder.data?.rows || []);
   };
 
   const handleQueueRowSelectionChange = (
@@ -164,7 +164,7 @@ export const EditorContainer = () => {
         <TabsContent value="media">
           <DataTable
             columns={columns}
-            data={mediaInFolder.data || []}
+            data={mediaInFolder.data?.rows || []}
             rowSelection={mediaRowSelection}
             onRowSelectionChange={handleMediaRowSelectionChange}
             isLoading={mediaInFolder.isFetching}

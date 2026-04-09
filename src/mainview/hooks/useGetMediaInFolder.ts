@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
 import { getMedialInFolder } from "@/services/editor.service";
-import type { MediaWithExif } from "~/shared/types";
+import { useQuery } from "@tanstack/react-query";
+import type { MedialInFolderResult } from "~/shared/types";
 
 export const mediaInFolderQueryKeys = {
   all: ["mediaInFolder"] as const,
@@ -11,7 +11,7 @@ export const mediaInFolderQueryKeys = {
 };
 
 export function useMediaInFolder(folderPath: string | null) {
-  return useQuery<MediaWithExif[]>({
+  return useQuery<MedialInFolderResult>({
     enabled: !!folderPath,
     queryKey: mediaInFolderQueryKeys.byFolder(folderPath),
     queryFn: () => getMedialInFolder(folderPath ?? ""),

@@ -1,13 +1,13 @@
 import { electroview } from "@/services";
-import type { MediaWithExif } from "~/shared/types";
+import type { MedialInFolderResult } from "~/shared/types";
 
 export const getMedialInFolder = async (
   folderPath: string,
-): Promise<MediaWithExif[]> => {
+): Promise<MedialInFolderResult> => {
   const result = await electroview.rpc?.request.getMedialInFolder({
     folderPath,
   });
-  return result || [];
+  return result ?? { rows: [], counter: { total: 0, success: 0, failed: 0 } };
 };
 
 export const checkFileExists = async (filePath: string) => {
