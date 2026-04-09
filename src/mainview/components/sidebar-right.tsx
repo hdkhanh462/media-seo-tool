@@ -1,3 +1,8 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2Icon } from "lucide-react";
+import { useEffect, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { ExifForm } from "@/components/ExifForm";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,11 +16,6 @@ import { ExifFormSchema } from "@/schemas/exif.schema";
 import { useEditorStore } from "@/store/useEditorStore";
 import type { ExifFormValues } from "@/types/exif.types";
 import { middleEllipsis } from "@/utils/formatter";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2Icon } from "lucide-react";
-import { useEffect, useMemo } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 const DEFAULT_VALUES: ExifFormValues = {
   title: "",
@@ -63,7 +63,7 @@ export function SidebarRight({
         ...selectedMedia.exif,
       });
     }
-  }, [form, selectedMedia]);
+  }, [form, activeTab, selectedMedia]);
 
   const isExistInQueue = useMemo(
     () => mediaQueue.some((m) => m.name === selectedMedia?.name),

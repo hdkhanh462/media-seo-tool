@@ -1,3 +1,6 @@
+import type { RowSelectionState, Updater } from "@tanstack/react-table";
+import { FolderOpenIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
 import { columns } from "@/components/media-table/columns";
@@ -6,11 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMediaInFolder } from "@/hooks/useGetMediaInFolder";
 import { useSelectFolder } from "@/hooks/useSelectFolder";
-import { EditorTab, useEditorStore } from "@/store/useEditorStore";
-import { RowSelectionState, Updater } from "@tanstack/react-table";
-import { FolderOpenIcon } from "lucide-react";
-import { useEffect, useState } from "react";
-import { MediaWithExif } from "~/shared/types";
+import { type EditorTab, useEditorStore } from "@/store/useEditorStore";
+import type { MediaWithExif } from "~/shared/types";
 
 export const EditorContainer = () => {
   const activeTab = useEditorStore((state) => state.activeTab);
@@ -67,7 +67,7 @@ export const EditorContainer = () => {
       setQueueRowSelection(index >= 0 ? { [index]: true } : {});
       setMediaRowSelection({});
     }
-  }, [selectedMedia]);
+  }, [activeTab, mediaInFolder, selectedMedia, mediaQueue]);
 
   const updateSelectRow = (
     updater: Updater<RowSelectionState>,

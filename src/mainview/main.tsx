@@ -1,12 +1,5 @@
 import "@/index.css";
 
-import App from "@/App";
-import { AppHeader } from "@/components/app-header";
-import { SidebarLeft } from "@/components/sidebar-left";
-import { SidebarRight } from "@/components/sidebar-right";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { Toaster } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   QueryCache,
   QueryClient,
@@ -15,6 +8,13 @@ import {
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { toast } from "sonner";
+import App from "@/App";
+import { AppHeader } from "@/components/app-header";
+import { SidebarLeft } from "@/components/sidebar-left";
+import { SidebarRight } from "@/components/sidebar-right";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const queryClient = new QueryClient({
   defaultOptions: {

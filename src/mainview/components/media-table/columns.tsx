@@ -5,10 +5,10 @@ import { StarIcon } from "lucide-react";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
 import { BadgeOverflow } from "@/components/ui/badge-overflow";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Rating, RatingItem } from "@/components/ui/rating";
 import { bytesToSize } from "@/utils/formatter";
 import type { MediaWithExif } from "~/shared/types";
-import { Checkbox } from "@/components/ui/checkbox";
 
 export const columns: ColumnDef<MediaWithExif>[] = [
   {

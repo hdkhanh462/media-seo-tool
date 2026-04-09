@@ -1,13 +1,4 @@
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { cn } from "@/lib/utils";
-import {
   type ColumnDef,
   type ColumnFiltersState,
   type FilterFnOption,
@@ -17,8 +8,8 @@ import {
   getFacetedUniqueValues,
   getFilteredRowModel,
   getSortedRowModel,
-  OnChangeFn,
-  RowSelectionState,
+  type OnChangeFn,
+  type RowSelectionState,
   type SortingState,
   type Table as TableType,
   useReactTable,
@@ -26,6 +17,15 @@ import {
 } from "@tanstack/react-table";
 import { Loader2Icon } from "lucide-react";
 import * as React from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
