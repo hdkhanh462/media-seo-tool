@@ -12,8 +12,9 @@ import { useEditorStore } from "@/store/useEditorStore";
 import type { ExifFormValues } from "@/types/exif.types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 const DEFAULT_VALUES: ExifFormValues = {
   title: "",
@@ -30,6 +31,7 @@ export function SidebarRight({
 }: React.ComponentProps<typeof Sidebar>) {
   const activeTab = useEditorStore((state) => state.activeTab);
   const selectedMedia = useEditorStore((state) => state.selectedMedia);
+  const mediaQueue = useEditorStore((state) => state.mediaQueue);
   const setSelectedMedia = useEditorStore((state) => state.setSelectedMedia);
   const addMediaToQueue = useEditorStore((state) => state.addMediaToQueue);
   const updateMediaInQueue = useEditorStore(
@@ -63,12 +65,25 @@ export function SidebarRight({
     }
   }, [form, selectedMedia]);
 
+  const isExistInQueue = useMemo(
+    () => mediaQueue.some((m) => m.name === selectedMedia?.name),
+    [selectedMedia, mediaQueue],
+  );
+
   const handleSubmit = (data: ExifFormValues) => {
     if (!selectedMedia) return;
 
     if (activeTab === "media") {
+      if (isExistInQueue) {
+        toast.error("Media already exists in queue");
+        return;
+      }
       addMediaToQueue({ ...selectedMedia, exif: data });
     } else {
+      if (!isExistInQueue) {
+        toast.error("Media not found in queue");
+        return;
+      }
       updateMediaInQueue({ ...selectedMedia, exif: data });
     }
     setSelectedMedia(null);
@@ -83,7 +98,7 @@ export function SidebarRight({
       <SidebarHeader className="border-sidebar-border border-b px-4">
         <div className="flex items-center justify-between gap-2">
           <h2 className="font-semibold">
-            {activeTab === "media" ? "Edit Exif" : "Edit Queue"}
+            {activeTab === "media" ? "Edit Media Exif" : "Edit Media in Queue"}
           </h2>
           {selectedMedia && <Badge>{selectedMedia.name}</Badge>}
         </div>

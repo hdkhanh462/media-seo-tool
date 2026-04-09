@@ -1,11 +1,13 @@
 import { create } from "zustand";
 import type { MediaWithExif } from "~/shared/types";
 
+export type EditorTab = "media" | "queue";
+
 interface EditorState {
-  activeTab: "media" | "queue";
+  activeTab: EditorTab;
   selectedMedia: MediaWithExif | null;
   mediaQueue: MediaWithExif[];
-  setActiveTab: (tab: "media" | "queue") => void;
+  setActiveTab: (tab: EditorTab) => void;
   setSelectedMedia: (media: MediaWithExif | null) => void;
   addMediaToQueue: (media: MediaWithExif) => void;
   updateMediaInQueue: (media: MediaWithExif) => void;
@@ -19,7 +21,12 @@ export const useEditorStore = create<EditorState>((set) => ({
   setActiveTab: (tab) => set({ activeTab: tab }),
   setSelectedMedia: (media) => set({ selectedMedia: media }),
   addMediaToQueue: (media) =>
-    set((state) => ({ mediaQueue: [...state.mediaQueue, media] })),
+    set((state) => {
+      if (state.mediaQueue.some((m) => m.name === media.name)) {
+        return { mediaQueue: state.mediaQueue };
+      }
+      return { mediaQueue: [...state.mediaQueue, media] };
+    }),
   updateMediaInQueue: (media) =>
     set((state) => ({
       mediaQueue: state.mediaQueue.map((m) =>

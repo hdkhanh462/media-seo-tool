@@ -17,6 +17,8 @@ import {
   getFacetedUniqueValues,
   getFilteredRowModel,
   getSortedRowModel,
+  OnChangeFn,
+  RowSelectionState,
   type SortingState,
   type Table as TableType,
   useReactTable,
@@ -30,7 +32,9 @@ interface DataTableProps<TData, TValue> {
   globalFilter?: string;
   // biome-ignore lint/suspicious/noExplicitAny: <>
   globalFilterFn?: FilterFnOption<any>;
-  onRowClick?: (row: TData) => void;
+  rowSelection?: RowSelectionState;
+  selectOnClick?: boolean;
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>;
   children?: (table: TableType<TData>) => React.ReactNode;
 }
 
@@ -39,10 +43,12 @@ export function DataTable<TData, TValue>({
   data,
   globalFilter,
   globalFilterFn,
+  rowSelection,
+  selectOnClick,
   children,
-  onRowClick,
+  onRowSelectionChange,
 }: DataTableProps<TData, TValue>) {
-  const [rowSelection, setRowSelection] = React.useState({});
+  // const [rowSelection, setRowSelection] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
@@ -72,7 +78,8 @@ export function DataTable<TData, TValue>({
     //   },
     // },
     enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
+    enableMultiRowSelection: false,
+    onRowSelectionChange,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
@@ -113,8 +120,14 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  onClick={() => onRowClick?.(row.original)}
-                  className={cn(onRowClick && "cursor-pointer")}
+                  onClick={() => {
+                    if (selectOnClick) {
+                      onRowSelectionChange?.((prev) =>
+                        prev[row.index] ? {} : { [row.index]: true },
+                      );
+                    }
+                  }}
+                  className={cn(selectOnClick && "cursor-pointer")}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

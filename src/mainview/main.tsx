@@ -8,6 +8,7 @@ import { AppHeader } from "@/components/app-header";
 import { SidebarLeft } from "@/components/sidebar-left";
 import { SidebarRight } from "@/components/sidebar-right";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 const queryClient = new QueryClient();
@@ -28,5 +29,6 @@ createRoot(document.getElementById("root")!).render(
         </div>
       </TooltipProvider>
     </QueryClientProvider>
+    <Toaster richColors />
   </StrictMode>,
 );

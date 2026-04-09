@@ -8,8 +8,23 @@ import { BadgeOverflow } from "@/components/ui/badge-overflow";
 import { Rating, RatingItem } from "@/components/ui/rating";
 import { bytesToSize } from "@/utils/formatter";
 import type { MediaWithExif } from "~/shared/types";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const columns: ColumnDef<MediaWithExif>[] = [
+  {
+    id: "select",
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        onClick={(e) => e.stopPropagation()}
+        aria-label="Select row"
+        className="translate-y-0.5"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -21,7 +36,9 @@ export const columns: ColumnDef<MediaWithExif>[] = [
   },
   {
     accessorKey: "type",
-    header: "Type",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Type" />
+    ),
     cell: ({ row }) => {
       const type = (row.getValue("type") as string).split("/")[1].toUpperCase();
       return <Badge>{type}</Badge>;
@@ -42,14 +59,14 @@ export const columns: ColumnDef<MediaWithExif>[] = [
     accessorKey: "exif.title",
     header: "Title",
     cell: ({ row }) => (
-      <div className="max-w-50 truncate">{row.original.exif?.title || "-"}</div>
+      <div className="max-w-30 truncate">{row.original.exif?.title || "-"}</div>
     ),
   },
   {
     accessorKey: "exif.subject",
     header: "Subject",
     cell: ({ row }) => (
-      <div className="max-w-50 truncate">
+      <div className="max-w-20 truncate">
         {row.original.exif?.subject || "-"}
       </div>
     ),
@@ -60,9 +77,10 @@ export const columns: ColumnDef<MediaWithExif>[] = [
     cell: ({ row }) => {
       const keywords = row.original.exif?.keywords || [];
       return (
-        <div className="flex max-w-50 flex-wrap gap-1">
+        <div className="flex min-w-30 max-w-50 flex-wrap gap-1">
           {keywords.length > 0 ? (
             <BadgeOverflow
+              className="w-full"
               items={keywords}
               renderBadge={(_, label) => (
                 <Badge key={label} variant="secondary">
@@ -79,7 +97,9 @@ export const columns: ColumnDef<MediaWithExif>[] = [
   },
   {
     accessorKey: "exif.rating",
-    header: "Rating",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Rating" />
+    ),
     cell: ({ row }) => {
       const rating = row.original.exif?.rating || 0;
       return (
@@ -96,11 +116,19 @@ export const columns: ColumnDef<MediaWithExif>[] = [
   {
     accessorKey: "exif.author",
     header: "Author",
-    cell: ({ row }) => <div>{row.original.exif?.author || "-"}</div>,
+    cell: ({ row }) => (
+      <div className="max-w-20 truncate">
+        {row.original.exif?.author || "-"}
+      </div>
+    ),
   },
   {
     accessorKey: "exif.license",
     header: "License",
-    cell: ({ row }) => <div>{row.original.exif?.license || "-"}</div>,
+    cell: ({ row }) => (
+      <div className="max-w-20 truncate">
+        {row.original.exif?.license || "-"}
+      </div>
+    ),
   },
 ];
