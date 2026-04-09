@@ -1,10 +1,10 @@
 import path from "node:path";
 import { BrowserView, BrowserWindow, Screen } from "electrobun/bun";
 import type { MainWebviewRPCType } from "~/shared/types";
-import { extractMetadata as bunExtractMetadata } from "./services/extractService";
-import { loadHistory, updateHistory } from "./services/historyService";
-import { injectMetadata as bunInjectMetadata } from "./services/injectService";
-import { openFileDialog } from "./services/inputService";
+import { extractMetadata as bunExtractMetadata } from "./services/extract.service";
+import { loadHistory, updateHistory } from "./services/history.service";
+import { injectMetadata as bunInjectMetadata } from "./services/inject.service";
+import { openFileDialog } from "./services/input.service";
 import {
   fakeMaximize,
   getCenterPosition,

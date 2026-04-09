@@ -3,8 +3,8 @@ import { columns } from "@/components/media-table/columns";
 import { mockMediaList } from "@/components/media-table/mock-data";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEditorStore } from "@/store/useEditorStore";
-import { NameFilterInput } from "../media-table/NameFilterInput";
-import { DataTableViewOptions } from "../data-table/data-table-view-options";
+import { NameFilterInput } from "@/components/media-table/NameFilterInput";
+import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
 
 export const EditorContainer = () => {
   const activeTab = useEditorStore((state) => state.activeTab);
