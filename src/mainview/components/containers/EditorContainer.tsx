@@ -11,7 +11,6 @@ export const EditorContainer = () => {
   const mediaQueue = useEditorStore((state) => state.mediaQueue);
   const setActiveTab = useEditorStore((state) => state.setActiveTab);
   const setSelectedMedia = useEditorStore((state) => state.setSelectedMedia);
-  const setEditingMedia = useEditorStore((state) => state.setEditingMedia);
 
   return (
     <div>
@@ -22,7 +21,6 @@ export const EditorContainer = () => {
         value={activeTab}
         onValueChange={(value) => {
           setSelectedMedia(null);
-          setEditingMedia(null);
           setActiveTab(value as "media" | "queue");
         }}
       >
@@ -48,7 +46,7 @@ export const EditorContainer = () => {
           <DataTable
             columns={columns}
             data={mediaQueue}
-            onRowClick={(row) => setEditingMedia(row)}
+            onRowClick={(row) => setSelectedMedia(row)}
           >
             {(table) => (
               <div className="flex items-center justify-between">

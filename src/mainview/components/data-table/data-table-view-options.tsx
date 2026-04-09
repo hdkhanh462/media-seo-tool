@@ -45,9 +45,12 @@ export function DataTableViewOptions<TData>({
                 key={column.id}
                 className="capitalize"
                 checked={column.getIsVisible()}
-                onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                onCheckedChange={(value) => {
+                  console.log(column.id, value);
+                  column.toggleVisibility(!!value);
+                }}
               >
-                {column.id}
+                {column.id.includes("_") ? column.id.split("_")[1] : column.id}
               </DropdownMenuCheckboxItem>
             );
           })}

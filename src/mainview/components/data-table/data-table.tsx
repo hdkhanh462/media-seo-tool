@@ -1,4 +1,13 @@
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { cn } from "@/lib/utils";
+import {
   type ColumnDef,
   type ColumnFiltersState,
   type FilterFnOption,
@@ -8,22 +17,12 @@ import {
   getFacetedUniqueValues,
   getFilteredRowModel,
   getSortedRowModel,
-  type OnChangeFn,
   type SortingState,
   type Table as TableType,
   useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
 import * as React from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { cn } from "@/lib/utils";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -31,8 +30,6 @@ interface DataTableProps<TData, TValue> {
   globalFilter?: string;
   // biome-ignore lint/suspicious/noExplicitAny: <>
   globalFilterFn?: FilterFnOption<any>;
-  columnVisibility?: VisibilityState;
-  onColumnVisibilityChange?: OnChangeFn<VisibilityState>;
   onRowClick?: (row: TData) => void;
   children?: (table: TableType<TData>) => React.ReactNode;
 }
@@ -42,15 +39,15 @@ export function DataTable<TData, TValue>({
   data,
   globalFilter,
   globalFilterFn,
-  columnVisibility,
   children,
-  onColumnVisibilityChange,
   onRowClick,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [sorting, setSorting] = React.useState<SortingState>([
     {
       id: "updatedAt",
@@ -78,7 +75,7 @@ export function DataTable<TData, TValue>({
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange,
+    onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     // getPaginationRowModel: getPaginationRowModel(),

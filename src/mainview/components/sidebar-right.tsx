@@ -30,7 +30,7 @@ export function SidebarRight({
 }: React.ComponentProps<typeof Sidebar>) {
   const activeTab = useEditorStore((state) => state.activeTab);
   const selectedMedia = useEditorStore((state) => state.selectedMedia);
-  const editingMedia = useEditorStore((state) => state.editingMedia);
+  const setSelectedMedia = useEditorStore((state) => state.setSelectedMedia);
   const addMediaToQueue = useEditorStore((state) => state.addMediaToQueue);
   const updateMediaInQueue = useEditorStore(
     (state) => state.updateMediaInQueue,
@@ -45,28 +45,33 @@ export function SidebarRight({
   });
 
   useEffect(() => {
-    if (activeTab === "media" && selectedMedia) {
+    if (!selectedMedia) {
+      form.reset(DEFAULT_VALUES);
+      return;
+    }
+
+    if (activeTab === "media") {
       form.reset({
         ...DEFAULT_VALUES,
         ...selectedMedia.exif,
       });
-    } else if (activeTab === "queue" && editingMedia) {
+    } else {
       form.reset({
         ...DEFAULT_VALUES,
-        ...editingMedia.exif,
+        ...selectedMedia.exif,
       });
-    } else {
-      form.reset(DEFAULT_VALUES);
     }
-  }, [form, selectedMedia, editingMedia]);
+  }, [form, selectedMedia]);
 
   const handleSubmit = (data: ExifFormValues) => {
-    if (activeTab === "media" && selectedMedia) {
+    if (!selectedMedia) return;
+
+    if (activeTab === "media") {
       addMediaToQueue({ ...selectedMedia, exif: data });
-    } else if (activeTab === "queue" && editingMedia) {
-      updateMediaInQueue({ ...editingMedia, exif: data });
+    } else {
+      updateMediaInQueue({ ...selectedMedia, exif: data });
     }
-    form.reset(DEFAULT_VALUES);
+    setSelectedMedia(null);
   };
 
   return (
@@ -87,7 +92,7 @@ export function SidebarRight({
         <ExifForm
           id="exif-form"
           form={form}
-          disabled={activeTab === "media" ? !selectedMedia : !editingMedia}
+          disabled={!selectedMedia}
           onSubmitData={handleSubmit}
         />
       </SidebarContent>
