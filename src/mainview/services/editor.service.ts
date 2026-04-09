@@ -1,4 +1,5 @@
 import { electroview } from "@/services";
+import { toast } from "sonner";
 import type { MedialInFolderResult } from "~/shared/types";
 
 export const getMedialInFolder = async (
@@ -7,6 +8,14 @@ export const getMedialInFolder = async (
   const result = await electroview.rpc?.request.getMedialInFolder({
     folderPath,
   });
+  toast.success(
+    `Media files loaded successfully (${result?.counter.success}/${result?.counter.total})`,
+  );
+  if ((result?.counter.failed ?? 0) > 0) {
+    toast.error(
+      `Media files failed to load (${result?.counter.failed}/${result?.counter.total})`,
+    );
+  }
   return result ?? { rows: [], counter: { total: 0, success: 0, failed: 0 } };
 };
 
