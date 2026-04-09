@@ -1,4 +1,4 @@
-import { SizeUnit } from "@/types/formatter";
+import type { SizeUnit } from "@/types/formatter.types";
 
 export const SIZE_UNITS: SizeUnit[] = ["Bytes", "KB", "MB", "GB", "TB", "PB"];
 
@@ -14,7 +14,7 @@ export const bytesToSize = (bytes: number, decimals = 2): BytesToSizeReturn => {
   const k = 1024;
 
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  const value = parseFloat((bytes / Math.pow(k, i)).toFixed(decimals));
+  const value = parseFloat((bytes / k ** i).toFixed(decimals));
 
   return {
     value,

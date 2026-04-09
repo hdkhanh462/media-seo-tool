@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { loadHistory } from "@/services/mediaRpcClient";
+import { loadHistory } from "@/services/media.service";
 import type { HistoryData } from "~/shared/types";
 
 export const historyQueryKeys = {

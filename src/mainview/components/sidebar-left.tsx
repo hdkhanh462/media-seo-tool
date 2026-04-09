@@ -6,7 +6,7 @@ import type * as React from "react";
 import { NavMain } from "@/components/nav-main";
 import { Sidebar, SidebarContent, SidebarRail } from "@/components/ui/sidebar";
 import { useAppStore } from "@/store/useAppStore";
-import type { NavMainItem } from "@/types/sidebar";
+import type { NavMainItem } from "@/types/sidebar.types";
 
 export function SidebarLeft({
   ...props

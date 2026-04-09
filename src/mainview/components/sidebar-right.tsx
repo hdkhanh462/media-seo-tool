@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 import { ExifFormSchema } from "@/schemas/exif.schema";
 import { useAppStore } from "@/store/useAppStore";
-import { ExifFormValues } from "@/types/exif.types";
+import type { ExifFormValues } from "@/types/exif.types";
 
 export function SidebarRight({
   ...props
@@ -38,10 +38,10 @@ export function SidebarRight({
   return (
     <Sidebar
       collapsible="none"
-      className="sticky w-md top-(--header-height) hidden h-[calc(100svh-var(--header-height))]! border-l lg:flex"
+      className="sticky top-(--header-height) hidden h-[calc(100svh-var(--header-height))]! w-md border-l lg:flex"
       {...props}
     >
-      <SidebarHeader className="border-b border-sidebar-border px-4">
+      <SidebarHeader className="border-sidebar-border border-b px-4">
         <div className="flex items-center gap-2">
           <h2 className="font-semibold">Edit Exif</h2>
           {selectedMedia && (

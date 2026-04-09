@@ -18,7 +18,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { useAppStore } from "@/store/useAppStore";
-import type { NavMainItem } from "@/types/sidebar";
+import type { NavMainItem } from "@/types/sidebar.types";
 
 type Props = {
   label?: string;

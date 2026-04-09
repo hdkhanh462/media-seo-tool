@@ -1,5 +1,5 @@
 import { type UseMutationOptions, useMutation } from "@tanstack/react-query";
-import { selectFolder } from "@/services/inputService";
+import { selectFolder } from "@/services/input.service";
 import type { OpenFileDialogResult } from "~/shared/types";
 
 export function useSelectFolder(

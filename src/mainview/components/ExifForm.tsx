@@ -1,5 +1,5 @@
 import { RefreshCcwIcon, StarIcon } from "lucide-react";
-import { Controller, UseFormReturn } from "react-hook-form";
+import { Controller, type UseFormReturn } from "react-hook-form";
 
 import {
   Field,
@@ -37,7 +37,7 @@ export const ExifForm: React.FC<Props> = ({ form, onSubmitData }) => {
   return (
     <form
       onSubmit={form.handleSubmit(onSubmit)}
-      className="space-y-4 max-w-full p-4"
+      className="max-w-full space-y-4 p-4"
     >
       <Controller
         name="title"
@@ -88,8 +88,8 @@ export const ExifForm: React.FC<Props> = ({ form, onSubmitData }) => {
               editable
               addOnPaste
             >
-              <InputGroup className="min-h-10 h-auto has-[[data-slot=tags-input-input]:focus-visible]:border-ring has-[[data-slot=tags-input-input]:focus-visible]:ring-3 has-[[data-slot=tags-input-input]:focus-visible]:ring-ring/50">
-                <TagsInputList className="bg-transparent border-none ring-0 focus-within:ring-0">
+              <InputGroup className="h-auto min-h-10 has-[[data-slot=tags-input-input]:focus-visible]:border-ring has-[[data-slot=tags-input-input]:focus-visible]:ring-3 has-[[data-slot=tags-input-input]:focus-visible]:ring-ring/50">
+                <TagsInputList className="border-none bg-transparent ring-0 focus-within:ring-0">
                   {field.value?.map((keyword) => (
                     <TagsInputItem key={keyword} value={keyword}>
                       {keyword}
@@ -147,7 +147,7 @@ export const ExifForm: React.FC<Props> = ({ form, onSubmitData }) => {
               <Rating
                 value={field.value}
                 onValueChange={field.onChange}
-                className="gap-1 text-yellow-500 h-9"
+                className="h-9 gap-1 text-yellow-500"
               >
                 {Array.from({ length: 5 }, (_, i) => (
                   <RatingItem key={i}>

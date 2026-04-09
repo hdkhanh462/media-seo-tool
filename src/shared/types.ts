@@ -1,5 +1,5 @@
-import { ExifFormValues } from "@/types/exif.types";
 import type { RPCSchema } from "electrobun";
+import type { ExifFormValues } from "@/types/exif.types";
 
 export interface ExtractOptions {
   imagesFolder: string;

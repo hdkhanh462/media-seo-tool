@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { MediaWithExif } from "~/shared/types";
+import type { MediaWithExif } from "~/shared/types";
 
 export type ActiveContent = "editor" | "settings";
 
