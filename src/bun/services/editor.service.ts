@@ -66,3 +66,7 @@ export const getMedialInFolder = async (
 
   return rows.filter((row) => row !== null) as MediaWithExif[];
 };
+
+export const checkFileExists = (filePath: string): boolean => {
+  return fs.existsSync(filePath);
+};

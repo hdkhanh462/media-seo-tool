@@ -1,7 +1,7 @@
 import path from "node:path";
 import { BrowserView, BrowserWindow, Screen } from "electrobun/bun";
 import type { MainWebviewRPCType } from "~/shared/types";
-import { getMedialInFolder } from "./services/editor.service";
+import { checkFileExists, getMedialInFolder } from "./services/editor.service";
 import { extractMetadata as bunExtractMetadata } from "./services/extract.service";
 import { loadHistory, updateHistory } from "./services/history.service";
 import { injectMetadata as bunInjectMetadata } from "./services/inject.service";
@@ -75,6 +75,9 @@ const mainWebviewRPC = BrowserView.defineRPC<MainWebviewRPCType>({
       },
       getMedialInFolder: async (params) => {
         return getMedialInFolder(params.folderPath);
+      },
+      checkFileExists: async (params) => {
+        return checkFileExists(params.filePath);
       },
     },
     // When the browser sends a message we can handle it

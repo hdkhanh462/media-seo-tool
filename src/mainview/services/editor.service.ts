@@ -9,3 +9,8 @@ export const getMedialInFolder = async (
   });
   return result || [];
 };
+
+export const checkFileExists = async (filePath: string) => {
+  const result = await electroview.rpc?.request.checkFileExists({ filePath });
+  return result ?? false;
+};

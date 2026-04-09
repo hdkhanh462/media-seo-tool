@@ -1,28 +1,67 @@
-import type { RowSelectionState, Updater } from "@tanstack/react-table";
-import { FolderOpenIcon } from "lucide-react";
-import { useEffect, useState } from "react";
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
 import { columns } from "@/components/media-table/columns";
 import { NameFilterInput } from "@/components/media-table/NameFilterInput";
 import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMediaInFolder } from "@/hooks/useGetMediaInFolder";
 import { useSelectFolder } from "@/hooks/useSelectFolder";
-import { type EditorTab, useEditorStore } from "@/store/useEditorStore";
+import {
+  type EditorTab,
+  ExportType,
+  useEditorStore,
+} from "@/store/useEditorStore";
+import type { RowSelectionState, Updater } from "@tanstack/react-table";
+import { FolderOpenIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 import type { MediaWithExif } from "~/shared/types";
+import { ExportDialog } from "../ExportDialog";
+import { useDialog } from "@/hooks/use-dialog";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ExportSchema } from "@/schemas/export.schema";
+import { ExportValues } from "@/types/export.types";
+import { cn } from "@/lib/utils";
 
+const EXPORT_TYPES: { value: ExportType; label: string }[] = [
+  { value: "xlsx", label: "Excel" },
+  { value: "csv", label: "CSV" },
+  { value: "json", label: "JSON" },
+];
+
+const DEFAULT_VALUES: ExportValues = {
+  fileName: "",
+  folderPath: "",
+  fullPath: "",
+};
 export const EditorContainer = () => {
+  const exportQueueForm = useForm<ExportValues>({
+    resolver: zodResolver(ExportSchema),
+    defaultValues: DEFAULT_VALUES,
+  });
+
   const activeTab = useEditorStore((state) => state.activeTab);
+  const exportType = useEditorStore((state) => state.exportType);
   const mediaQueue = useEditorStore((state) => state.mediaQueue);
   const selectedMedia = useEditorStore((state) => state.selectedMedia);
   const selectFolderPath = useEditorStore((state) => state.selectFolderPath);
   const setActiveTab = useEditorStore((state) => state.setActiveTab);
+  const setExportType = useEditorStore((state) => state.setExportType);
   const setSelectedMedia = useEditorStore((state) => state.setSelectedMedia);
   const setSelectFolderPath = useEditorStore(
     (state) => state.setSelectFolderPath,
   );
 
+  const exportDialog = useDialog();
   const mediaInFolder = useMediaInFolder(selectFolderPath);
 
   const [mediaRowSelection, setMediaRowSelection] = useState<RowSelectionState>(
@@ -58,7 +97,9 @@ export const EditorContainer = () => {
       const index = mediaInFolder.data?.findIndex(
         (media) => media.name === selectedMedia?.name,
       );
-      setMediaRowSelection(index && index >= 0 ? { [index]: true } : {});
+      setMediaRowSelection(
+        index !== undefined && index >= 0 ? { [index]: true } : {},
+      );
       setQueueRowSelection({});
     } else {
       const index = mediaQueue.findIndex(
@@ -67,7 +108,7 @@ export const EditorContainer = () => {
       setQueueRowSelection(index >= 0 ? { [index]: true } : {});
       setMediaRowSelection({});
     }
-  }, [activeTab, mediaInFolder, selectedMedia, mediaQueue]);
+  }, [activeTab, mediaInFolder.data, selectedMedia, mediaQueue]);
 
   const updateSelectRow = (
     updater: Updater<RowSelectionState>,
@@ -159,12 +200,52 @@ export const EditorContainer = () => {
             {(table) => (
               <div className="flex items-center justify-between">
                 <NameFilterInput table={table} />
-                <DataTableViewOptions table={table} />
+                <div className="flex items-center gap-2">
+                  <ButtonGroup
+                    className={cn(mediaQueue.length > 0 ? "flex" : "hidden")}
+                  >
+                    <Button variant="outline" onClick={exportDialog.open}>
+                      Export
+                    </Button>
+                    <Select
+                      value={exportType}
+                      onValueChange={(value) =>
+                        setExportType(value as ExportType)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        <SelectGroup>
+                          {EXPORT_TYPES.map((type) => (
+                            <SelectItem key={type.value} value={type.value}>
+                              {type.label}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </ButtonGroup>
+                  <DataTableViewOptions table={table} />
+                </div>
               </div>
             )}
           </DataTable>
         </TabsContent>
       </Tabs>
+
+      <ExportDialog
+        form={exportQueueForm}
+        formId="export-form-queue"
+        title="Export"
+        description="Export media with exif information"
+        open={exportDialog.isOpen}
+        onOpenChange={exportDialog.onChange}
+        onSubmit={(data) => {
+          console.log(data);
+        }}
+      />
     </div>
   );
 };

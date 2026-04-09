@@ -79,6 +79,10 @@ export type MainWebviewRPCType = {
         params: { folderPath: string };
         response: MediaWithExif[];
       };
+      checkFileExists: {
+        params: { filePath: string };
+        response: boolean;
+      };
     };
     messages: {
       closeWindow: undefined;
