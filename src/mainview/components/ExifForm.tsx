@@ -20,18 +20,25 @@ import { Textarea } from "@/components/ui/textarea";
 import type { ExifFormValues } from "@/types/exif.types";
 
 type Props = {
+  id?: string;
   form: UseFormReturn<ExifFormValues>;
   disabled?: boolean;
   onSubmitData?: (data: ExifFormValues) => void;
 };
 
-export const ExifForm: React.FC<Props> = ({ form, disabled, onSubmitData }) => {
+export const ExifForm: React.FC<Props> = ({
+  id,
+  form,
+  disabled,
+  onSubmitData,
+}) => {
   function onSubmit(data: ExifFormValues) {
     onSubmitData?.(data);
   }
 
   return (
     <form
+      id={id}
       onSubmit={form.handleSubmit(onSubmit)}
       className="max-w-full space-y-4 p-4"
     >

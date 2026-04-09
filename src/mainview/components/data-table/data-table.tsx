@@ -1,13 +1,4 @@
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { cn } from "@/lib/utils";
-import {
   type ColumnDef,
   type ColumnFiltersState,
   type FilterFnOption,
@@ -24,6 +15,15 @@ import {
   type VisibilityState,
 } from "@tanstack/react-table";
 import * as React from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -90,7 +90,7 @@ export function DataTable<TData, TValue>({
   return (
     <div className="flex flex-col gap-4">
       {children?.(table)}
-      <div className="rounded-md border">
+      <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

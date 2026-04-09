@@ -1,7 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2Icon } from "lucide-react";
-import { useForm } from "react-hook-form";
-
 import { ExifForm } from "@/components/ExifForm";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,43 +8,66 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar";
 import { ExifFormSchema } from "@/schemas/exif.schema";
-import { useAppStore } from "@/store/useAppStore";
+import { useEditorStore } from "@/store/useEditorStore";
 import type { ExifFormValues } from "@/types/exif.types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2Icon } from "lucide-react";
 import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+
+const DEFAULT_VALUES: ExifFormValues = {
+  title: "",
+  description: "",
+  keywords: [],
+  subject: "",
+  rating: 0,
+  author: "",
+  license: "",
+};
 
 export function SidebarRight({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
-  const selectedMedia = useAppStore((state) => state.selectedMedia);
+  const activeTab = useEditorStore((state) => state.activeTab);
+  const selectedMedia = useEditorStore((state) => state.selectedMedia);
+  const editingMedia = useEditorStore((state) => state.editingMedia);
+  const addMediaToQueue = useEditorStore((state) => state.addMediaToQueue);
+  const updateMediaInQueue = useEditorStore(
+    (state) => state.updateMediaInQueue,
+  );
 
   const form = useForm<ExifFormValues>({
     resolver: zodResolver(ExifFormSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      keywords: [],
-      subject: "",
-      rating: 0,
-      author: "",
-      license: "",
+      ...DEFAULT_VALUES,
       ...selectedMedia?.exif,
     },
   });
 
   useEffect(() => {
-    if (selectedMedia) {
+    if (activeTab === "media" && selectedMedia) {
       form.reset({
-        title: "",
-        description: "",
-        keywords: [],
-        subject: "",
-        rating: 0,
-        author: "",
-        license: "",
+        ...DEFAULT_VALUES,
         ...selectedMedia.exif,
       });
+    } else if (activeTab === "queue" && editingMedia) {
+      form.reset({
+        ...DEFAULT_VALUES,
+        ...editingMedia.exif,
+      });
+    } else {
+      form.reset(DEFAULT_VALUES);
     }
-  }, [selectedMedia, form]);
+  }, [form, selectedMedia, editingMedia]);
+
+  const handleSubmit = (data: ExifFormValues) => {
+    if (activeTab === "media" && selectedMedia) {
+      addMediaToQueue({ ...selectedMedia, exif: data });
+    } else if (activeTab === "queue" && editingMedia) {
+      updateMediaInQueue({ ...editingMedia, exif: data });
+    }
+    form.reset(DEFAULT_VALUES);
+  };
 
   return (
     <Sidebar
@@ -58,12 +77,19 @@ export function SidebarRight({
     >
       <SidebarHeader className="border-sidebar-border border-b px-4">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="font-semibold">Edit Exif</h2>
+          <h2 className="font-semibold">
+            {activeTab === "media" ? "Edit Exif" : "Edit Queue"}
+          </h2>
           {selectedMedia && <Badge>{selectedMedia.name}</Badge>}
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <ExifForm form={form} disabled={!selectedMedia} />
+        <ExifForm
+          id="exif-form"
+          form={form}
+          disabled={activeTab === "media" ? !selectedMedia : !editingMedia}
+          onSubmitData={handleSubmit}
+        />
       </SidebarContent>
       <SidebarFooter className="p-4">
         <div className="grid grid-cols-2 gap-4">
@@ -77,15 +103,20 @@ export function SidebarRight({
           </Button>
           <Button
             type="submit"
+            form="exif-form"
             disabled={form.formState.isSubmitting || !form.formState.isDirty}
           >
             {form.formState.isSubmitting ? (
               <>
                 <Loader2Icon className="animate-spin" />
-                Submitting...
+                {activeTab === "media"
+                  ? "Adding to Queue..."
+                  : "Updating Queue..."}
               </>
+            ) : activeTab === "media" ? (
+              "Add to Queue"
             ) : (
-              "Submit"
+              "Update Queue"
             )}
           </Button>
         </div>

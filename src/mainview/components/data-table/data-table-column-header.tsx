@@ -10,10 +10,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-interface DataTableColumnHeaderProps<
-  TData,
-  TValue,
-> extends React.HTMLAttributes<HTMLDivElement> {
+interface DataTableColumnHeaderProps<TData, TValue>
+  extends React.HTMLAttributes<HTMLDivElement> {
   column: Column<TData, TValue>;
   title: string;
   align?: "start" | "end" | "center";
@@ -31,7 +29,7 @@ export function DataTableColumnHeader<TData, TValue>({
         className={cn(
           align === "center" && "text-center",
           align === "end" && "text-right",
-          className
+          className,
         )}
       >
         {title}
@@ -45,7 +43,7 @@ export function DataTableColumnHeader<TData, TValue>({
         "flex items-center gap-2",
         align === "center" && "justify-center",
         align === "end" && "justify-end",
-        className
+        className,
       )}
     >
       <DropdownMenu>
