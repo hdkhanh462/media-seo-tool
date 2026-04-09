@@ -73,18 +73,20 @@ export function SidebarRight({
   const handleSubmit = (data: ExifFormValues) => {
     if (!selectedMedia) return;
 
+    const mediaWithExif = { ...selectedMedia, exif: data };
+
     if (activeTab === "media") {
       if (isExistInQueue) {
         toast.error("Media already exists in queue");
         return;
       }
-      addMediaToQueue({ ...selectedMedia, exif: data });
+      addMediaToQueue(mediaWithExif);
     } else {
       if (!isExistInQueue) {
         toast.error("Media not found in queue");
         return;
       }
-      updateMediaInQueue({ ...selectedMedia, exif: data });
+      updateMediaInQueue(mediaWithExif);
     }
     setSelectedMedia(null);
   };

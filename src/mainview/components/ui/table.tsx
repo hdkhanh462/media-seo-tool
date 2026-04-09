@@ -3,10 +3,17 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 function Table({ className, ...props }: React.ComponentProps<"table">) {
+  const handleHorizontalScroll = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (e.deltaY === 0) return;
+
+    e.currentTarget.scrollLeft += e.deltaY;
+  };
+
   return (
     <div
       data-slot="table-container"
       className="relative w-full overflow-x-auto overflow-y-hidden"
+      onWheel={handleHorizontalScroll}
     >
       <table
         data-slot="table"

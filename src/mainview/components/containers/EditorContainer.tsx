@@ -23,6 +23,21 @@ export const EditorContainer = () => {
     {},
   );
 
+  // Prevent ctrl + scroll
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
+
   useEffect(() => {
     if (activeTab === "media") {
       const index = mockMediaList.findIndex(
@@ -39,7 +54,7 @@ export const EditorContainer = () => {
     }
   }, [selectedMedia]);
 
-  const getNewState = (
+  const updateSelectRow = (
     updater: Updater<RowSelectionState>,
     rowSelection: RowSelectionState,
     data: MediaWithExif[],
@@ -56,19 +71,18 @@ export const EditorContainer = () => {
     });
 
     setSelectedMedia(selectedRow || null);
-    return newState;
   };
 
   const handleMediaRowSelectionChange = (
     updater: Updater<RowSelectionState>,
   ) => {
-    getNewState(updater, mediaRowSelection, mockMediaList);
+    updateSelectRow(updater, mediaRowSelection, mockMediaList);
   };
 
   const handleQueueRowSelectionChange = (
     updater: Updater<RowSelectionState>,
   ) => {
-    getNewState(updater, queueRowSelection, mediaQueue);
+    updateSelectRow(updater, queueRowSelection, mediaQueue);
   };
 
   return (
