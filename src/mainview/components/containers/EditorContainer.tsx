@@ -1,11 +1,14 @@
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
 import { columns } from "@/components/media-table/columns";
-import { mockMediaList } from "@/components/media-table/mock-data";
 import { NameFilterInput } from "@/components/media-table/NameFilterInput";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useMediaInFolder } from "@/hooks/useGetMediaInFolder";
+import { useSelectFolder } from "@/hooks/useSelectFolder";
 import { EditorTab, useEditorStore } from "@/store/useEditorStore";
 import { RowSelectionState, Updater } from "@tanstack/react-table";
+import { FolderOpenIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { MediaWithExif } from "~/shared/types";
 
@@ -13,8 +16,14 @@ export const EditorContainer = () => {
   const activeTab = useEditorStore((state) => state.activeTab);
   const mediaQueue = useEditorStore((state) => state.mediaQueue);
   const selectedMedia = useEditorStore((state) => state.selectedMedia);
+  const selectFolderPath = useEditorStore((state) => state.selectFolderPath);
   const setActiveTab = useEditorStore((state) => state.setActiveTab);
   const setSelectedMedia = useEditorStore((state) => state.setSelectedMedia);
+  const setSelectFolderPath = useEditorStore(
+    (state) => state.setSelectFolderPath,
+  );
+
+  const mediaInFolder = useMediaInFolder(selectFolderPath);
 
   const [mediaRowSelection, setMediaRowSelection] = useState<RowSelectionState>(
     {},
@@ -22,6 +31,12 @@ export const EditorContainer = () => {
   const [queueRowSelection, setQueueRowSelection] = useState<RowSelectionState>(
     {},
   );
+
+  const folderSelect = useSelectFolder({
+    onSuccess: (data) => {
+      setSelectFolderPath(data.path);
+    },
+  });
 
   // Prevent ctrl + scroll
   useEffect(() => {
@@ -40,10 +55,10 @@ export const EditorContainer = () => {
 
   useEffect(() => {
     if (activeTab === "media") {
-      const index = mockMediaList.findIndex(
+      const index = mediaInFolder.data?.findIndex(
         (media) => media.name === selectedMedia?.name,
       );
-      setMediaRowSelection(index >= 0 ? { [index]: true } : {});
+      setMediaRowSelection(index && index >= 0 ? { [index]: true } : {});
       setQueueRowSelection({});
     } else {
       const index = mediaQueue.findIndex(
@@ -76,7 +91,7 @@ export const EditorContainer = () => {
   const handleMediaRowSelectionChange = (
     updater: Updater<RowSelectionState>,
   ) => {
-    updateSelectRow(updater, mediaRowSelection, mockMediaList);
+    updateSelectRow(updater, mediaRowSelection, mediaInFolder.data || []);
   };
 
   const handleQueueRowSelectionChange = (
@@ -108,15 +123,27 @@ export const EditorContainer = () => {
         <TabsContent value="media">
           <DataTable
             columns={columns}
-            data={mockMediaList}
+            data={mediaInFolder.data || []}
             rowSelection={mediaRowSelection}
             onRowSelectionChange={handleMediaRowSelectionChange}
+            isLoading={mediaInFolder.isFetching}
             selectOnClick
           >
             {(table) => (
               <div className="flex items-center justify-between">
                 <NameFilterInput table={table} />
-                <DataTableViewOptions table={table} />
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => folderSelect.mutate()}
+                    disabled={folderSelect.isPending}
+                  >
+                    <FolderOpenIcon />
+                    Select Folder
+                  </Button>
+                  <DataTableViewOptions table={table} />
+                </div>
               </div>
             )}
           </DataTable>

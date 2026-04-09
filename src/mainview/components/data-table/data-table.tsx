@@ -24,6 +24,7 @@ import {
   useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
+import { Loader2Icon } from "lucide-react";
 import * as React from "react";
 
 interface DataTableProps<TData, TValue> {
@@ -34,6 +35,7 @@ interface DataTableProps<TData, TValue> {
   globalFilterFn?: FilterFnOption<any>;
   rowSelection?: RowSelectionState;
   selectOnClick?: boolean;
+  isLoading?: boolean;
   onRowSelectionChange?: OnChangeFn<RowSelectionState>;
   children?: (table: TableType<TData>) => React.ReactNode;
 }
@@ -45,6 +47,7 @@ export function DataTable<TData, TValue>({
   globalFilterFn,
   rowSelection,
   selectOnClick,
+  isLoading,
   children,
   onRowSelectionChange,
 }: DataTableProps<TData, TValue>) {
@@ -115,7 +118,19 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <Loader2Icon className="animate-spin" />
+                    Loading...
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}

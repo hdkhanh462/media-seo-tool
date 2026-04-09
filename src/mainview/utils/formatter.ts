@@ -22,3 +22,10 @@ export const bytesToSize = (bytes: number, decimals = 2): BytesToSizeReturn => {
     label: `${value} ${SIZE_UNITS[i]}`,
   };
 };
+
+export const middleEllipsis = (str: string, maxLength = 20) => {
+  if (str.length <= maxLength) return str;
+
+  const half = Math.floor((maxLength - 3) / 2);
+  return str.slice(0, half) + "..." + str.slice(-half);
+};

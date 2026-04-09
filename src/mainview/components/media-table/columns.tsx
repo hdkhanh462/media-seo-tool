@@ -40,7 +40,9 @@ export const columns: ColumnDef<MediaWithExif>[] = [
       <DataTableColumnHeader column={column} title="Type" />
     ),
     cell: ({ row }) => {
-      const type = (row.getValue("type") as string).split("/")[1].toUpperCase();
+      const type = (row.getValue("type") as string)
+        .split("/")[1]
+        ?.toUpperCase();
       return <Badge>{type}</Badge>;
     },
   },
@@ -65,11 +67,26 @@ export const columns: ColumnDef<MediaWithExif>[] = [
   {
     accessorKey: "exif.subject",
     header: "Subject",
-    cell: ({ row }) => (
-      <div className="max-w-20 truncate">
-        {row.original.exif?.subject || "-"}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const subjects = row.original.exif?.subjects || [];
+      return (
+        <div className="flex min-w-30 max-w-50 flex-wrap gap-1">
+          {subjects.length > 0 ? (
+            <BadgeOverflow
+              className="w-full"
+              items={subjects}
+              renderBadge={(_, label) => (
+                <Badge key={label} variant="secondary">
+                  {label}
+                </Badge>
+              )}
+            />
+          ) : (
+            <span>-</span>
+          )}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "exif.keywords",
@@ -119,15 +136,6 @@ export const columns: ColumnDef<MediaWithExif>[] = [
     cell: ({ row }) => (
       <div className="max-w-20 truncate">
         {row.original.exif?.author || "-"}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "exif.license",
-    header: "License",
-    cell: ({ row }) => (
-      <div className="max-w-20 truncate">
-        {row.original.exif?.license || "-"}
       </div>
     ),
   },

@@ -10,6 +10,7 @@ import {
   getCenterPosition,
   getMainViewUrl,
 } from "./utils/window";
+import { getMedialInFolder } from "./services/editor.service";
 
 const WINDOW_WIDTH = 900;
 const WINDOW_HEIGHT = 600;
@@ -71,6 +72,9 @@ const mainWebviewRPC = BrowserView.defineRPC<MainWebviewRPCType>({
       },
       loadHistory: async () => {
         return loadHistory();
+      },
+      getMedialInFolder: async (params) => {
+        return getMedialInFolder(params.folderPath);
       },
     },
     // When the browser sends a message we can handle it

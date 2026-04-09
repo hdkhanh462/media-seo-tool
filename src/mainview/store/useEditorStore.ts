@@ -5,10 +5,12 @@ export type EditorTab = "media" | "queue";
 
 interface EditorState {
   activeTab: EditorTab;
-  selectedMedia: MediaWithExif | null;
   mediaQueue: MediaWithExif[];
+  selectedMedia: MediaWithExif | null;
+  selectFolderPath: string | null;
   setActiveTab: (tab: EditorTab) => void;
   setSelectedMedia: (media: MediaWithExif | null) => void;
+  setSelectFolderPath: (path: string | null) => void;
   addMediaToQueue: (media: MediaWithExif) => void;
   updateMediaInQueue: (media: MediaWithExif) => void;
   removeMediaFromQueue: (media: MediaWithExif) => void;
@@ -16,10 +18,12 @@ interface EditorState {
 
 export const useEditorStore = create<EditorState>((set) => ({
   activeTab: "media",
-  selectedMedia: null,
   mediaQueue: [],
+  selectedMedia: null,
+  selectFolderPath: null,
   setActiveTab: (tab) => set({ activeTab: tab }),
   setSelectedMedia: (media) => set({ selectedMedia: media }),
+  setSelectFolderPath: (path) => set({ selectFolderPath: path }),
   addMediaToQueue: (media) =>
     set((state) => {
       if (state.mediaQueue.some((m) => m.name === media.name)) {

@@ -10,6 +10,7 @@ import {
 import { ExifFormSchema } from "@/schemas/exif.schema";
 import { useEditorStore } from "@/store/useEditorStore";
 import type { ExifFormValues } from "@/types/exif.types";
+import { middleEllipsis } from "@/utils/formatter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon } from "lucide-react";
 import { useEffect, useMemo } from "react";
@@ -20,10 +21,9 @@ const DEFAULT_VALUES: ExifFormValues = {
   title: "",
   description: "",
   keywords: [],
-  subject: "",
+  subjects: [],
   rating: 0,
   author: "",
-  license: "",
 };
 
 export function SidebarRight({
@@ -102,7 +102,7 @@ export function SidebarRight({
           <h2 className="font-semibold">
             {activeTab === "media" ? "Edit Media Exif" : "Edit Media in Queue"}
           </h2>
-          {selectedMedia && <Badge>{selectedMedia.name}</Badge>}
+          {selectedMedia && <Badge>{middleEllipsis(selectedMedia.name)}</Badge>}
         </div>
       </SidebarHeader>
       <SidebarContent>

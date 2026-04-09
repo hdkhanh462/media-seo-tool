@@ -75,6 +75,10 @@ export type MainWebviewRPCType = {
         params: undefined;
         response: HistoryData;
       };
+      getMedialInFolder: {
+        params: { folderPath: string };
+        response: MediaWithExif[];
+      };
     };
     messages: {
       closeWindow: undefined;

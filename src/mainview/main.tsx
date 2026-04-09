@@ -1,8 +1,5 @@
 import "@/index.css";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
 import App from "@/App";
 import { AppHeader } from "@/components/app-header";
 import { SidebarLeft } from "@/components/sidebar-left";
@@ -10,8 +7,47 @@ import { SidebarRight } from "@/components/sidebar-right";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import {
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { toast } from "sonner";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+      // staleTime: 1000 * 60 * 5, // 5 minutes
+    },
+    mutations: {
+      onSettled: (...params) => {
+        const { meta } = params[4];
+
+        if (meta?.invalidateQueries) {
+          queryClient.invalidateQueries({
+            queryKey: meta.invalidateQueries,
+            // type: "active",
+          });
+        }
+      },
+    },
+  },
+  queryCache: new QueryCache({
+    onError: (error, query) => {
+      toast.error("Something went wrong!", {
+        description: error.message,
+        action: {
+          label: "Retry",
+          onClick: query.invalidate,
+        },
+      });
+    },
+  }),
+});
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -28,7 +64,7 @@ createRoot(document.getElementById("root")!).render(
           </SidebarProvider>
         </div>
       </TooltipProvider>
+      <Toaster richColors />
     </QueryClientProvider>
-    <Toaster richColors />
   </StrictMode>,
 );
