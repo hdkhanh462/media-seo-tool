@@ -22,11 +22,10 @@ export function ExtractTab() {
 
   const historyQuery = useHistoryData();
   const folderSelect = useSelectFolder({
-    onSuccess: (res) => {
-      if (res.path) {
-        setImagesFolder(res.path);
+    onSuccess: (path) => {
+      if (path) {
+        setImagesFolder(path);
       }
-      setResult(res.message);
     },
     onError: (error) => {
       setResult(
@@ -35,11 +34,10 @@ export function ExtractTab() {
     },
   });
   const outputFolderSelect = useSelectFolder({
-    onSuccess: (res) => {
-      if (res.path) {
-        setOutputFolder(res.path);
+    onSuccess: (path) => {
+      if (path) {
+        setOutputFolder(path);
       }
-      setResult(res.message);
     },
     onError: (error) => {
       setResult(

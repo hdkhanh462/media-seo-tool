@@ -1,14 +1,47 @@
 import type { RPCSchema } from "electrobun";
+import type { ExifValues } from "@/types/exif.types";
 
-export interface ExtractOptions {
+export type ExtractOptions = {
   imagesFolder: string;
   outputExcel: string;
-}
+};
 
-export interface InjectOptions {
+export type InjectOptions = {
   imagesFolder: string;
   excelFile: string;
-}
+};
+
+export type ExportType = "xlsx" | "csv" | "json";
+
+export type ExportToExcelOptions = {
+  sheetName?: string;
+  autoFilter?: boolean;
+  freezeHeader?: boolean;
+};
+export type ExportToCSVOptions = {
+  delimiter?: "," | ";" | "\t";
+  encoding?: "utf-8" | "utf-16le";
+  quoteValues?: boolean;
+};
+export type ExportToJSONOptions = {
+  minify?: boolean;
+  includeNull?: boolean;
+};
+
+export type StartQueueOptions = {
+  folderPath: string;
+  media: MediaInQueue[];
+};
+
+export type ExportMediaOptions = {
+  fullPath: string;
+  media: MediaInQueue[];
+  overwrite?: boolean;
+} & (
+  | { type: "xlsx"; meta?: ExportToExcelOptions }
+  | { type: "csv"; meta?: ExportToCSVOptions }
+  | { type: "json"; meta?: ExportToJSONOptions }
+);
 
 export type ExtractResult = {
   success: boolean;
@@ -35,6 +68,27 @@ export type HistoryData = {
   lastUsed?: string;
 };
 
+export type MediaWithExif = {
+  name: string;
+  size: number;
+  type: string;
+  lastModified: number;
+  exif: ExifValues;
+};
+
+export type MediaInQueue = Pick<MediaWithExif, "name" | "exif">;
+
+export type Counter = {
+  total: number;
+  success: number;
+  failed: number;
+};
+
+export type MedialInFolderResult = {
+  rows: MediaWithExif[];
+  counter: Counter;
+};
+
 export type MainWebviewRPCType = {
   // functions that execute in the main process
   bun: RPCSchema<{
@@ -56,18 +110,41 @@ export type MainWebviewRPCType = {
       };
       selectFolder: {
         params: undefined;
-        response: OpenFileDialogResult;
+        response: string;
       };
-      selectExcelFile: {
-        params: undefined;
-        response: OpenFileDialogResult;
+      selectFile: {
+        params: { type: ExportType };
+        response: string;
       };
       loadHistory: {
         params: undefined;
         response: HistoryData;
       };
+      getMedialInFolder: {
+        params: { folderPath: string };
+        response: MedialInFolderResult;
+      };
+      checkFileExists: {
+        params: { filePath: string };
+        response: boolean;
+      };
+      exportMedia: {
+        params: ExportMediaOptions;
+        response: boolean;
+      };
+      importMedia: {
+        params: { fullPath: string };
+        response: MediaInQueue[];
+      };
+      startQueue: {
+        params: StartQueueOptions;
+        response: Counter;
+      };
     };
     messages: {
+      closeWindow: undefined;
+      minimizeWindow: undefined;
+      toggleMaximizeWindow: undefined;
       logToBun: {
         msg: string;
       };

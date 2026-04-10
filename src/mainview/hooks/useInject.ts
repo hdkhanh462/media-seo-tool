@@ -4,7 +4,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { historyQueryKeys } from "@/hooks/useHistory";
-import { injectMetadata } from "@/services/mediaRpcClient";
+import { injectMetadata } from "@/services/media.service";
 import type { InjectResult } from "~/shared/types";
 
 export type InjectParams = {

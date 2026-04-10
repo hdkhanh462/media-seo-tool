@@ -8,28 +8,11 @@
   "files": {
     "ignoreUnknown": true,
     "includes": [
-      "**",
-      "!**/.next",
-      "!**/dist",
+      "**/src/**",
       "!**/.turbo",
-      "!**/dev-dist",
-      "!**/.zed",
       "!**/.vscode",
-      "!**/routeTree.gen.ts",
-      "!**/src-tauri",
-      "!**/.nuxt",
-      "!bts.jsonc",
-      "!**/.expo",
-      "!**/.wrangler",
-      "!**/.alchemy",
-      "!**/.svelte-kit",
-      "!**/wrangler.jsonc",
-      "!**/.source",
-      "!**/convex/_generated",
-      "!**/components/ui",
-      "!**/ui/src/components",
       "!**/*.d.ts",
-      "!**/old-cli/*.ts"
+      "!**/components/ui"
     ]
   },
   "formatter": {

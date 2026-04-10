@@ -43,3 +43,10 @@ export const getExif = (tags: Tags) => {
     comments,
   };
 };
+
+export const splitKeywords = (value?: string | string[]) => {
+  if (!value) return undefined;
+  return typeof value === "string"
+    ? value.split(";").map((k) => k.trim())
+    : value;
+};

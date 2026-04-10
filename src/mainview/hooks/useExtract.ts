@@ -4,7 +4,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { historyQueryKeys } from "@/hooks/useHistory";
-import { extractMetadata } from "@/services/mediaRpcClient";
+import { extractMetadata } from "@/services/media.service";
 import type { ExtractResult } from "~/shared/types";
 
 export type ExtractParams = {

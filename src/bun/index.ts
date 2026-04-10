@@ -1,38 +1,31 @@
 import path from "node:path";
-import { BrowserView, BrowserWindow, Updater } from "electrobun/bun";
+import { BrowserView, BrowserWindow, Screen } from "electrobun/bun";
 import type { MainWebviewRPCType } from "~/shared/types";
-import { extractMetadata as bunExtractMetadata } from "./services/extractService";
-import { loadHistory, updateHistory } from "./services/historyService";
-import { injectMetadata as bunInjectMetadata } from "./services/injectService";
-import { openFileDialog } from "./services/inputService";
+import {
+  checkFileExists,
+  getMedialInFolder,
+  startQueue,
+} from "./services/editor.service";
+import { exportMedia } from "./services/export.service";
+import { extractMetadata as bunExtractMetadata } from "./services/extract.service";
+import { loadHistory, updateHistory } from "./services/history.service";
+import { importMedia } from "./services/import.service";
+import { injectMetadata as bunInjectMetadata } from "./services/inject.service";
+import { openFileDialog } from "./services/input.service";
+import {
+  fakeMaximize,
+  getCenterPosition,
+  getMainViewUrl,
+} from "./utils/window";
 
-export interface OpenFileDialogOptions {
-  canChooseDirectory?: boolean;
-  canChooseFiles?: boolean;
-  allowsMultipleSelection?: boolean;
-  directoryURL?: string;
-  allowedFileTypes?: string[];
-}
-
-const DEV_SERVER_PORT = 5173;
-const DEV_SERVER_URL = `http://localhost:${DEV_SERVER_PORT}`;
-
-// Check if Vite dev server is running for HMR
-async function getMainViewUrl(): Promise<string> {
-  const channel = await Updater.localInfo.channel();
-  if (channel === "dev") {
-    try {
-      await fetch(DEV_SERVER_URL, { method: "HEAD" });
-      console.log(`HMR enabled: Using Vite dev server at ${DEV_SERVER_URL}`);
-      return DEV_SERVER_URL;
-    } catch {
-      console.log(
-        "Vite dev server not running. Run 'bun run dev:hmr' for HMR support.",
-      );
-    }
-  }
-  return "views://mainview/index.html";
-}
+const WINDOW_WIDTH = 900;
+const WINDOW_HEIGHT = 600;
+let IS_MAXIMIZED = true;
+let PREV_BOUNDS = {
+  width: WINDOW_WIDTH,
+  height: WINDOW_HEIGHT,
+  ...getCenterPosition(WINDOW_WIDTH, WINDOW_HEIGHT),
+};
 
 // Create the main application window
 const url = await getMainViewUrl();
@@ -48,11 +41,25 @@ const mainWebviewRPC = BrowserView.defineRPC<MainWebviewRPCType>({
           canChooseFiles: false,
         });
       },
-      selectExcelFile: async () => {
+      selectFile: async ({ type }) => {
+        let allowedFileTypes = "";
+
+        switch (type) {
+          case "xlsx":
+            allowedFileTypes = "xlsx, xls";
+            break;
+          case "csv":
+            allowedFileTypes = "csv";
+            break;
+          case "json":
+            allowedFileTypes = "json";
+            break;
+        }
+
         return openFileDialog({
           canChooseDirectory: false,
           canChooseFiles: true,
-          allowedFileTypes: "xlsx, xls",
+          allowedFileTypes,
         });
       },
       extractMetadata: async (params) => {
@@ -86,12 +93,51 @@ const mainWebviewRPC = BrowserView.defineRPC<MainWebviewRPCType>({
       loadHistory: async () => {
         return loadHistory();
       },
+      getMedialInFolder: async (params) => {
+        return getMedialInFolder(params.folderPath);
+      },
+      checkFileExists: async (params) => {
+        return checkFileExists(params.filePath);
+      },
+      exportMedia: async (params) => {
+        return exportMedia(params);
+      },
+      importMedia: async (params) => {
+        return importMedia(params.fullPath);
+      },
+      startQueue: async (params) => {
+        return startQueue(params);
+      },
     },
     // When the browser sends a message we can handle it
     // in the main bun process
     messages: {
       "*": (messageName, payload) => {
         console.log("Global message handler", messageName, payload);
+      },
+      closeWindow: () => mainWindow.close(),
+      minimizeWindow: () => mainWindow.minimize(),
+      toggleMaximizeWindow: () => {
+        if (IS_MAXIMIZED) {
+          // restore
+          mainWindow.setSize(PREV_BOUNDS.width, PREV_BOUNDS.height);
+          mainWindow.setPosition(PREV_BOUNDS.x, PREV_BOUNDS.y);
+        } else {
+          // save current
+          const { width, height } = mainWindow.getSize();
+          const { x, y } = mainWindow.getPosition();
+
+          PREV_BOUNDS = {
+            width,
+            height,
+            x,
+            y,
+          };
+
+          fakeMaximize(mainWindow);
+        }
+
+        IS_MAXIMIZED = !IS_MAXIMIZED;
       },
       logToBun: ({ msg }) => {
         console.log("Log to bun: ", msg);
@@ -100,16 +146,19 @@ const mainWebviewRPC = BrowserView.defineRPC<MainWebviewRPCType>({
   },
 });
 
-const _mainWindow = new BrowserWindow({
-  title: "Media SEO Tool",
+const { width, height } = Screen.getPrimaryDisplay().workArea;
+
+const mainWindow = new BrowserWindow({
+  title: "Media SEO Editor",
   url,
   frame: {
-    width: 900,
-    height: 600,
-    x: 200,
-    y: 200,
+    width,
+    height,
+    x: 0,
+    y: 0,
   },
   rpc: mainWebviewRPC,
+  titleBarStyle: "hidden",
 });
 
-console.log("Media SEO Tool started!");
+console.log("Media SEO Editor started!");

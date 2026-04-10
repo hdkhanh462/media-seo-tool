@@ -1,0 +1,173 @@
+import {
+  type ColumnDef,
+  type ColumnFiltersState,
+  type FilterFnOption,
+  flexRender,
+  getCoreRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
+  getFilteredRowModel,
+  getSortedRowModel,
+  type OnChangeFn,
+  type RowSelectionState,
+  type SortingState,
+  type Table as TableType,
+  useReactTable,
+  type VisibilityState,
+} from "@tanstack/react-table";
+import { Loader2Icon } from "lucide-react";
+import * as React from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { cn } from "@/lib/utils";
+
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  globalFilter?: string;
+  // biome-ignore lint/suspicious/noExplicitAny: <>
+  globalFilterFn?: FilterFnOption<any>;
+  rowSelection?: RowSelectionState;
+  selectOnClick?: boolean;
+  isLoading?: boolean;
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>;
+  children?: (table: TableType<TData>) => React.ReactNode;
+}
+
+export function DataTable<TData, TValue>({
+  columns,
+  data,
+  globalFilter,
+  globalFilterFn,
+  rowSelection,
+  selectOnClick,
+  isLoading,
+  children,
+  onRowSelectionChange,
+}: DataTableProps<TData, TValue>) {
+  // const [rowSelection, setRowSelection] = React.useState({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    [],
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
+  const [sorting, setSorting] = React.useState<SortingState>([
+    {
+      id: "updatedAt",
+      desc: true,
+    },
+  ]);
+
+  const table = useReactTable({
+    data,
+    columns,
+    state: {
+      sorting,
+      columnVisibility,
+      rowSelection,
+      columnFilters,
+      globalFilter,
+    },
+    globalFilterFn,
+    // initialState: {
+    //   pagination: {
+    //     pageSize: 10,
+    //   },
+    // },
+    enableRowSelection: true,
+    enableMultiRowSelection: false,
+    onRowSelectionChange,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    // getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
+  });
+
+  return (
+    <div className="flex flex-col gap-4">
+      {children?.(table)}
+      <div className="overflow-hidden rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id} colSpan={header.colSpan}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <Loader2Icon className="size-4 animate-spin text-primary" />
+                    Loading...
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  onClick={() => {
+                    if (selectOnClick) {
+                      onRowSelectionChange?.((prev) =>
+                        prev[row.index] ? {} : { [row.index]: true },
+                      );
+                    }
+                  }}
+                  className={cn(selectOnClick && "cursor-pointer")}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      {/* <DataTablePagination table={table} /> */}
+    </div>
+  );
+}

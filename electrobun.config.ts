@@ -2,9 +2,9 @@ import type { ElectrobunConfig } from "electrobun";
 
 export default {
   app: {
-    name: "media-seo-tool",
-    identifier: "media-seo-tool.electrobun.dev",
-    version: "0.1.1",
+    name: "Media SEO Editor",
+    identifier: "media-seo-editor.electrobun.dev",
+    version: "0.1.2",
   },
   build: {
     // Vite builds to dist/, we copy from there

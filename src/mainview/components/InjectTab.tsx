@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useHistoryData } from "@/hooks/useHistory";
 import { useInjectMetadata } from "@/hooks/useInject";
-import { useSelectExcel } from "@/hooks/useSelectExcel";
+import { useSelectFile } from "@/hooks/useSelectExcel";
 import { useSelectFolder } from "@/hooks/useSelectFolder";
 
 export function InjectTab() {
@@ -22,11 +22,10 @@ export function InjectTab() {
 
   const historyQuery = useHistoryData();
   const folderSelect = useSelectFolder({
-    onSuccess: (res) => {
-      if (res.path) {
-        setImagesFolder(res.path);
+    onSuccess: (path) => {
+      if (path) {
+        setImagesFolder(path);
       }
-      setResult(res.message);
     },
     onError: (error) => {
       setResult(
@@ -34,12 +33,11 @@ export function InjectTab() {
       );
     },
   });
-  const fileSelect = useSelectExcel({
-    onSuccess: (res) => {
-      if (res.path) {
-        setExcelFile(res.path);
+  const fileSelect = useSelectFile({
+    onSuccess: (path) => {
+      if (path) {
+        setExcelFile(path);
       }
-      setResult(res.message);
     },
     onError: (error) => {
       setResult(
@@ -77,7 +75,7 @@ export function InjectTab() {
   };
 
   const handleFileSelect = async () => {
-    fileSelect.mutate();
+    fileSelect.mutate("xlsx");
   };
 
   const handleRun = () => {
