@@ -1,3 +1,6 @@
+import { CheckIcon, CopyIcon, FolderOpenIcon, Loader2Icon } from "lucide-react";
+import { useEffect, useMemo } from "react";
+import { Controller, type UseFormReturn } from "react-hook-form";
 import { DialogWrapper } from "@/components/dialog-wrapper";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,11 +22,9 @@ import { useCheckFileExists } from "@/hooks/useExportMedia";
 import { useSelectFolder } from "@/hooks/useSelectFolder";
 import { cn } from "@/lib/utils";
 import { useEditorStore } from "@/store/useEditorStore";
-import { ExportValues } from "@/types/export.types";
+import type { ExportValues } from "@/types/import-export.types";
 import { getTimeStamp } from "@/utils/datetime";
-import { CheckIcon, CopyIcon, FolderOpenIcon, Loader2Icon } from "lucide-react";
-import { useEffect, useMemo } from "react";
-import { Controller, UseFormReturn } from "react-hook-form";
+import { Checkbox } from "./ui/checkbox";
 
 type Props = Omit<React.ComponentProps<typeof DialogWrapper>, "footer"> & {
   form: UseFormReturn<ExportValues>;
@@ -44,13 +45,16 @@ export const ExportDialog: React.FC<Props> = ({
   const fileName = form.watch("fileName");
   const folderPath = form.watch("folderPath");
   const fullPath = form.watch("fullPath");
+  const overwrite = form.watch("overwrite");
 
   const debouncedFullPath = useDebounce(fullPath, 500);
-  const checkFileExists = useCheckFileExists(debouncedFullPath);
+  const checkFileExists = useCheckFileExists(debouncedFullPath, {
+    enable: !overwrite,
+  });
   const folderSelect = useSelectFolder({
-    onSuccess: (res) => {
-      if (res.path) {
-        form.setValue("folderPath", res.path);
+    onSuccess: (path) => {
+      if (path) {
+        form.setValue("folderPath", path, { shouldDirty: true });
       }
     },
   });
@@ -68,7 +72,7 @@ export const ExportDialog: React.FC<Props> = ({
         { shouldDirty: true },
       );
     }
-  }, [form, selectFolderName, exportType]);
+  }, [form, selectFolderName]);
 
   useEffect(() => {
     if (!folderPath || !fileName) return;
@@ -77,6 +81,8 @@ export const ExportDialog: React.FC<Props> = ({
     form.setValue("fullPath", fullPath, { shouldDirty: true });
   }, [form, folderPath, fileName, exportType]);
 
+  const fileExists = overwrite ? false : checkFileExists.data;
+
   return (
     <DialogWrapper
       {...props}
@@ -84,7 +90,9 @@ export const ExportDialog: React.FC<Props> = ({
         <Button
           form={formId}
           type="submit"
-          disabled={form.formState.isSubmitting || !form.formState.isDirty}
+          disabled={
+            form.formState.isSubmitting || !form.formState.isDirty || fileExists
+          }
         >
           {form.formState.isSubmitting ? (
             <>
@@ -157,21 +165,21 @@ export const ExportDialog: React.FC<Props> = ({
           name="fullPath"
           control={form.control}
           render={({ field }) => (
-            <Field data-invalid={checkFileExists.data}>
+            <Field data-invalid={fileExists}>
               <FieldLabel
                 htmlFor={field.name}
-                className="flex items-center justify-between"
+                className="flex items-center gap-2"
               >
                 <span>Full Path</span>
                 {checkFileExists.isFetching && (
-                  <Loader2Icon className="size-4 text-primary animate-spin" />
+                  <Loader2Icon className="size-4 animate-spin text-primary" />
                 )}
               </FieldLabel>
               <InputGroup>
                 <InputGroupInput
                   {...field}
                   id={field.name}
-                  aria-invalid={checkFileExists.data}
+                  aria-invalid={fileExists}
                   placeholder="Full path will be generated automatically..."
                   readOnly
                 />
@@ -190,9 +198,27 @@ export const ExportDialog: React.FC<Props> = ({
               <FieldDescription>
                 Full path where the file will be exported.
               </FieldDescription>
-              {checkFileExists.data && (
+              {fileExists && (
                 <FieldError errors={[{ message: "File already exists" }]} />
               )}
+            </Field>
+          )}
+        />
+        <Controller
+          name="overwrite"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} orientation="horizontal">
+              <Checkbox
+                id={field.name}
+                aria-invalid={fieldState.invalid}
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+              <FieldLabel htmlFor={field.name}>
+                Overwrite existing file
+              </FieldLabel>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />

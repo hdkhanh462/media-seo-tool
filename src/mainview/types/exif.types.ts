@@ -1,4 +1,4 @@
 import type * as z from "zod";
-import type { ExifFormSchema } from "@/schemas/exif.schema";
+import type { ExifSchema } from "@/schemas/exif.schemas";
 
-export type ExifFormValues = z.infer<typeof ExifFormSchema>;
+export type ExifValues = z.infer<typeof ExifSchema>;

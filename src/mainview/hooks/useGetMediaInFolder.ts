@@ -1,5 +1,5 @@
-import { getMedialInFolder } from "@/services/editor.service";
 import { useQuery } from "@tanstack/react-query";
+import { getMedialInFolder } from "@/services/editor.service";
 import type { MedialInFolderResult } from "~/shared/types";
 
 export const mediaInFolderQueryKeys = {

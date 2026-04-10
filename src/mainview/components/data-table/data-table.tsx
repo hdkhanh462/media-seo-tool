@@ -1,13 +1,4 @@
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { cn } from "@/lib/utils";
-import {
   type ColumnDef,
   type ColumnFiltersState,
   type FilterFnOption,
@@ -26,6 +17,15 @@ import {
 } from "@tanstack/react-table";
 import { Loader2Icon } from "lucide-react";
 import * as React from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -125,7 +125,7 @@ export function DataTable<TData, TValue>({
                   className="h-24 text-center"
                 >
                   <div className="flex items-center justify-center gap-2">
-                    <Loader2Icon className="size-4 text-primary animate-spin" />
+                    <Loader2Icon className="size-4 animate-spin text-primary" />
                     Loading...
                   </div>
                 </TableCell>

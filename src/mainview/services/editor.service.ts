@@ -1,6 +1,6 @@
-import { electroview } from "@/services";
 import { toast } from "sonner";
-import type { MedialInFolderResult } from "~/shared/types";
+import { electroview } from "@/services";
+import type { ExportMediaOptions, MedialInFolderResult } from "~/shared/types";
 
 export const getMedialInFolder = async (
   folderPath: string,
@@ -22,4 +22,14 @@ export const getMedialInFolder = async (
 export const checkFileExists = async (filePath: string) => {
   const result = await electroview.rpc?.request.checkFileExists({ filePath });
   return result ?? false;
+};
+
+export const exportMedia = async (options: ExportMediaOptions) => {
+  const result = await electroview.rpc?.request.exportMedia(options);
+  return result ?? false;
+};
+
+export const importMedia = async (options: { fullPath: string }) => {
+  const result = await electroview.rpc?.request.importMedia(options);
+  return result ?? [];
 };

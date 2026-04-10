@@ -2,8 +2,10 @@ import path from "node:path";
 import { BrowserView, BrowserWindow, Screen } from "electrobun/bun";
 import type { MainWebviewRPCType } from "~/shared/types";
 import { checkFileExists, getMedialInFolder } from "./services/editor.service";
+import { exportMedia } from "./services/export.service";
 import { extractMetadata as bunExtractMetadata } from "./services/extract.service";
 import { loadHistory, updateHistory } from "./services/history.service";
+import { importMedia } from "./services/import.service";
 import { injectMetadata as bunInjectMetadata } from "./services/inject.service";
 import { openFileDialog } from "./services/input.service";
 import {
@@ -35,11 +37,25 @@ const mainWebviewRPC = BrowserView.defineRPC<MainWebviewRPCType>({
           canChooseFiles: false,
         });
       },
-      selectExcelFile: async () => {
+      selectFile: async ({ type }) => {
+        let allowedFileTypes = "";
+
+        switch (type) {
+          case "xlsx":
+            allowedFileTypes = "xlsx, xls";
+            break;
+          case "csv":
+            allowedFileTypes = "csv";
+            break;
+          case "json":
+            allowedFileTypes = "json";
+            break;
+        }
+
         return openFileDialog({
           canChooseDirectory: false,
           canChooseFiles: true,
-          allowedFileTypes: "xlsx, xls",
+          allowedFileTypes,
         });
       },
       extractMetadata: async (params) => {
@@ -78,6 +94,12 @@ const mainWebviewRPC = BrowserView.defineRPC<MainWebviewRPCType>({
       },
       checkFileExists: async (params) => {
         return checkFileExists(params.filePath);
+      },
+      exportMedia: async (params) => {
+        return exportMedia(params);
+      },
+      importMedia: async (params) => {
+        return importMedia(params.fullPath);
       },
     },
     // When the browser sends a message we can handle it

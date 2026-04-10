@@ -12,12 +12,13 @@ import {
   SidebarFooter,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { ExifFormSchema } from "@/schemas/exif.schema";
+import { ExifSchema } from "@/schemas/exif.schemas";
 import { useEditorStore } from "@/store/useEditorStore";
-import type { ExifFormValues } from "@/types/exif.types";
+import type { ExifValues } from "@/types/exif.types";
 import { middleEllipsis } from "@/utils/formatter";
+import type { MediaWithExif } from "~/shared/types";
 
-const DEFAULT_VALUES: ExifFormValues = {
+const DEFAULT_VALUES: ExifValues = {
   title: "",
   description: "",
   keywords: [],
@@ -38,8 +39,8 @@ export function SidebarRight({
     (state) => state.updateMediaInQueue,
   );
 
-  const form = useForm<ExifFormValues>({
-    resolver: zodResolver(ExifFormSchema),
+  const form = useForm<ExifValues>({
+    resolver: zodResolver(ExifSchema),
     defaultValues: {
       ...DEFAULT_VALUES,
       ...selectedMedia?.exif,
@@ -70,10 +71,21 @@ export function SidebarRight({
     [selectedMedia, mediaQueue],
   );
 
-  const handleSubmit = (data: ExifFormValues) => {
+  const handleSubmit = (data: ExifValues) => {
     if (!selectedMedia) return;
 
-    const mediaWithExif = { ...selectedMedia, exif: data };
+    const mediaWithExif: MediaWithExif = {
+      ...selectedMedia,
+      exif: {
+        title: data.title || undefined,
+        description: data.description || undefined,
+        comment: data.comment || undefined,
+        keywords: data.keywords || undefined,
+        subjects: data.subjects || undefined,
+        rating: data.rating || undefined,
+        author: data.author || undefined,
+      },
+    };
 
     if (activeTab === "media") {
       if (isExistInQueue) {

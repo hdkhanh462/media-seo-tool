@@ -1,8 +1,7 @@
 import { create } from "zustand";
-import type { MediaWithExif } from "~/shared/types";
+import type { ExportType, MediaWithExif } from "~/shared/types";
 
 export type EditorTab = "media" | "queue";
-export type ExportType = "xlsx" | "csv" | "json";
 
 interface EditorState {
   activeTab: EditorTab;
@@ -14,6 +13,7 @@ interface EditorState {
   setExportType: (type: ExportType) => void;
   setSelectedMedia: (media: MediaWithExif | null) => void;
   setSelectFolderPath: (path: string | null) => void;
+  setMediaQueue: (mediaQueue: MediaWithExif[]) => void;
   addMediaToQueue: (media: MediaWithExif) => void;
   updateMediaInQueue: (media: MediaWithExif) => void;
   removeMediaFromQueue: (media: MediaWithExif) => void;
@@ -29,6 +29,7 @@ export const useEditorStore = create<EditorState>((set) => ({
   setExportType: (type) => set({ exportType: type }),
   setSelectedMedia: (media) => set({ selectedMedia: media }),
   setSelectFolderPath: (path) => set({ selectFolderPath: path }),
+  setMediaQueue: (mediaQueue) => set({ mediaQueue }),
   addMediaToQueue: (media) =>
     set((state) => {
       if (state.mediaQueue.some((m) => m.name === media.name)) {

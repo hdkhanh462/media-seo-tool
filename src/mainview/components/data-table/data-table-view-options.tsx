@@ -50,7 +50,7 @@ export function DataTableViewOptions<TData>({
                   column.toggleVisibility(!!value);
                 }}
               >
-                {column.id.includes("_") ? column.id.split("_")[1] : column.id}
+                {column.id.includes("_") ? column.id?.split("_")[1] : column.id}
               </DropdownMenuCheckboxItem>
             );
           })}

@@ -1,15 +1,42 @@
 import type { RPCSchema } from "electrobun";
-import type { ExifFormValues } from "@/types/exif.types";
+import type { ExifValues } from "@/types/exif.types";
 
-export interface ExtractOptions {
+export type ExtractOptions = {
   imagesFolder: string;
   outputExcel: string;
-}
+};
 
-export interface InjectOptions {
+export type InjectOptions = {
   imagesFolder: string;
   excelFile: string;
-}
+};
+
+export type ExportType = "xlsx" | "csv" | "json";
+
+export type ExportToExcelOptions = {
+  sheetName?: string;
+  autoFilter?: boolean;
+  freezeHeader?: boolean;
+};
+export type ExportToCSVOptions = {
+  delimiter?: "," | ";" | "\t";
+  encoding?: "utf-8" | "utf-16le";
+  quoteValues?: boolean;
+};
+export type ExportToJSONOptions = {
+  minify?: boolean;
+  includeNull?: boolean;
+};
+
+export type ExportMediaOptions = {
+  fullPath: string;
+  media: MediaWithExif[];
+  overwrite?: boolean;
+} & (
+  | { type: "xlsx"; meta?: ExportToExcelOptions }
+  | { type: "csv"; meta?: ExportToCSVOptions }
+  | { type: "json"; meta?: ExportToJSONOptions }
+);
 
 export type ExtractResult = {
   success: boolean;
@@ -41,7 +68,7 @@ export type MediaWithExif = {
   size: number;
   type: string;
   lastModified: number;
-  exif: ExifFormValues;
+  exif: ExifValues;
 };
 
 export type MedialInFolderResult = {
@@ -74,11 +101,11 @@ export type MainWebviewRPCType = {
       };
       selectFolder: {
         params: undefined;
-        response: OpenFileDialogResult;
+        response: string;
       };
-      selectExcelFile: {
-        params: undefined;
-        response: OpenFileDialogResult;
+      selectFile: {
+        params: { type: ExportType };
+        response: string;
       };
       loadHistory: {
         params: undefined;
@@ -91,6 +118,14 @@ export type MainWebviewRPCType = {
       checkFileExists: {
         params: { filePath: string };
         response: boolean;
+      };
+      exportMedia: {
+        params: ExportMediaOptions;
+        response: boolean;
+      };
+      importMedia: {
+        params: { fullPath: string };
+        response: MediaWithExif[];
       };
     };
     messages: {

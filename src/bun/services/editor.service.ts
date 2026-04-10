@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import pLimit from "p-limit";
+
 import type { MedialInFolderResult, MediaWithExif } from "~/shared/types";
 import { getExiftoolInstance } from "../lib/exiftool-vendored";
 import { splitKeywords } from "../utils";
@@ -9,9 +10,9 @@ const MEDIA_EXTENSIONS = new Set([
   ".jpg",
   ".jpeg",
   ".png",
+  ".webp",
   ".mp4",
   ".mov",
-  ".webp",
 ]);
 
 export const getMedialInFolder = async (

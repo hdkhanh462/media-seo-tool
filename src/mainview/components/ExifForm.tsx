@@ -17,13 +17,13 @@ import {
   TagsInputList,
 } from "@/components/ui/tags-input";
 import { Textarea } from "@/components/ui/textarea";
-import type { ExifFormValues } from "@/types/exif.types";
+import type { ExifValues } from "@/types/exif.types";
 
 type Props = {
   id?: string;
-  form: UseFormReturn<ExifFormValues>;
+  form: UseFormReturn<ExifValues>;
   disabled?: boolean;
-  onSubmitData?: (data: ExifFormValues) => void;
+  onSubmitData?: (data: ExifValues) => void;
 };
 
 export const ExifForm: React.FC<Props> = ({
@@ -32,7 +32,7 @@ export const ExifForm: React.FC<Props> = ({
   disabled,
   onSubmitData,
 }) => {
-  function onSubmit(data: ExifFormValues) {
+  function onSubmit(data: ExifValues) {
     onSubmitData?.(data);
   }
 

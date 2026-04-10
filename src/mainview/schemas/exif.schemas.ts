@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-export const ExifFormSchema = z.object({
+export const ExifSchema = z.object({
   title: z
     .string()
     .max(100, "Title must be at most 100 characters.")
