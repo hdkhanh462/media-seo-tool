@@ -8,9 +8,9 @@ import { BadgeOverflow } from "@/components/ui/badge-overflow";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Rating, RatingItem } from "@/components/ui/rating";
 import { bytesToSize } from "@/utils/formatter";
-import type { MediaWithExif } from "~/shared/types";
+import type { MediaInQueue, MediaWithExif } from "~/shared/types";
 
-export const queueColumns: ColumnDef<MediaWithExif>[] = [
+export const queueColumns: ColumnDef<MediaInQueue>[] = [
   {
     id: "select",
     cell: ({ row }) => (

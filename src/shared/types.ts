@@ -71,6 +71,8 @@ export type MediaWithExif = {
   exif: ExifValues;
 };
 
+export type MediaInQueue = Pick<MediaWithExif, "name" | "exif">;
+
 export type MedialInFolderResult = {
   rows: MediaWithExif[];
   counter: {

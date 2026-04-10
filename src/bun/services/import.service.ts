@@ -2,23 +2,23 @@ import fs from "node:fs";
 import path from "node:path";
 import ExcelJS from "exceljs";
 
-import type { MediaWithExif } from "~/shared/types";
+import type { MediaInQueue } from "~/shared/types";
 import { splitKeywords } from "../utils";
 import { checkFileExists } from "./editor.service";
 
 export const importMediaFromExcel = async (
   fullPath: string,
-): Promise<MediaWithExif[]> => {
+): Promise<MediaInQueue[]> => {
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.readFile(fullPath);
   const worksheet = workbook.getWorksheet("SEO Data") || workbook.worksheets[0];
 
-  const results: MediaWithExif[] = [];
+  const results: MediaInQueue[] = [];
 
   worksheet.eachRow((row, rowNumber) => {
     if (rowNumber === 1) return; // Skip header
 
-    const fileName = row.getCell(1).text;
+    const name = row.getCell(1).text;
     const title = row.getCell(2).text;
     const description = row.getCell(3).text;
     const comment = row.getCell(4).text;
@@ -28,7 +28,7 @@ export const importMediaFromExcel = async (
     const author = row.getCell(8).text;
 
     results.push({
-      name: fileName,
+      name: name,
       exif: {
         title: title || undefined,
         description: description || undefined,
@@ -38,7 +38,7 @@ export const importMediaFromExcel = async (
         rating: typeof ratingRaw === "number" ? ratingRaw : undefined,
         author: author || undefined,
       },
-    } as MediaWithExif);
+    });
   });
 
   return results;
@@ -46,11 +46,20 @@ export const importMediaFromExcel = async (
 
 export const importMediaFromCSV = async (
   fullPath: string,
-): Promise<MediaWithExif[]> => {
+): Promise<MediaInQueue[]> => {
   const content = fs.readFileSync(fullPath, "utf-8");
   const lines = content.split("\n").filter((line) => line.trim() !== "");
 
   return lines.map((line) => {
+    // Simple CSV split, handling basic quoting
+    const parts = line.split(",").map((p) => {
+      const trimmed = p.trim();
+      if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
+        return trimmed.slice(1, -1).replace(/""/g, '"');
+      }
+      return trimmed;
+    });
+
     const [
       name,
       title,
@@ -60,30 +69,52 @@ export const importMediaFromCSV = async (
       subjects,
       rating,
       author,
-    ] = line.split(",");
+    ] = parts;
+
     return {
       name,
       exif: {
-        title,
-        description,
-        comment,
+        title: title || undefined,
+        description: description || undefined,
+        comment: comment || undefined,
         keywords: splitKeywords(keywords),
         subjects: splitKeywords(subjects),
         rating: Number(rating) || 0,
-        author,
+        author: author || undefined,
       },
-    } as MediaWithExif;
+    };
   });
 };
 
 export const importMediaFromJSON = async (
   fullPath: string,
-): Promise<MediaWithExif[]> => {
+): Promise<MediaInQueue[]> => {
   const content = fs.readFileSync(fullPath, "utf-8");
-  return JSON.parse(content) as MediaWithExif[];
+  const data = JSON.parse(content);
+
+  if (Array.isArray(data)) {
+    return data.map((item) => {
+      return {
+        name: item.name,
+        exif: {
+          title: item.title,
+          description: item.description,
+          comment: item.comment,
+          keywords: splitKeywords(item.keywords),
+          subjects: splitKeywords(item.subjects),
+          rating: item.rating,
+          author: item.author,
+        },
+      };
+    });
+  }
+
+  return [];
 };
 
-export const importMedia = async (fullPath: string) => {
+export const importMedia = async (
+  fullPath: string,
+): Promise<MediaInQueue[]> => {
   const isExist = checkFileExists(fullPath);
   if (!isExist) {
     throw new Error("File not found");

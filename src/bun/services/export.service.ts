@@ -11,7 +11,7 @@ import type {
 import { checkFileExists } from "./editor.service";
 
 type TransformedMedia = {
-  fileName: string;
+  name: string;
   title?: string;
   description?: string;
   comment?: string;
@@ -30,7 +30,7 @@ type ExportFn<TOptions = never> = (
 export const transformMedia = (media: MediaWithExif[]): TransformedMedia[] => {
   return media.map((item) => {
     return {
-      fileName: item.name,
+      name: item.name,
       title: item.exif.title,
       description: item.exif.description,
       comment: item.exif.comment,
@@ -51,7 +51,7 @@ export const exportMediaToExcel: ExportFn<ExportToExcelOptions> = async (
   const worksheet = workbook.addWorksheet(options?.sheetName || "SEO Data");
 
   worksheet.columns = [
-    { header: "FileName", key: "fileName", width: 30 },
+    { header: "Name", key: "name", width: 30 },
     { header: "Title", key: "title", width: 40 },
     { header: "Description", key: "description", width: 40 },
     { header: "Comment", key: "comment", width: 40 },
@@ -107,7 +107,7 @@ export const exportMediaToCSV: ExportFn<ExportToCSVOptions> = async (
   const csvContent = transformedMedia
     .map((item) => {
       return [
-        item.fileName,
+        item.name,
         item.title,
         item.description,
         item.comment,

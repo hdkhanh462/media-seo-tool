@@ -1,6 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { RowSelectionState, Updater } from "@tanstack/react-table";
-import { FileDownIcon, FileUpIcon, FolderOpenIcon } from "lucide-react";
+import {
+  FileDownIcon,
+  FileUpIcon,
+  FolderOpenIcon,
+  PlayIcon,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -219,18 +224,24 @@ export const EditorContainer = () => {
         <h2 className="font-semibold tracking-tight">
           Media with Exif Information
         </h2>
-        <Tabs
-          value={activeTab}
-          onValueChange={(value) => {
-            setSelectedMedia(null);
-            setActiveTab(value as EditorTab);
-          }}
-        >
-          <TabsList>
-            <TabsTrigger value="media">Media List</TabsTrigger>
-            <TabsTrigger value="queue">Queue List</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="flex items-center gap-2">
+          <Tabs
+            value={activeTab}
+            onValueChange={(value) => {
+              setSelectedMedia(null);
+              setActiveTab(value as EditorTab);
+            }}
+          >
+            <TabsList>
+              <TabsTrigger value="media">Media List</TabsTrigger>
+              <TabsTrigger value="queue">Queue List</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <Button>
+            <PlayIcon />
+            Start Queue
+          </Button>
+        </div>
       </div>
       <Tabs value={activeTab}>
         <TabsContent value="media">
