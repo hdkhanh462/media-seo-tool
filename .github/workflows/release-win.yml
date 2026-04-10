@@ -1,4 +1,4 @@
-name: Build & Release (Electrobun)
+name: Build & Release for Windows (Electrobun)
 
 permissions:
   contents: write
@@ -6,16 +6,11 @@ permissions:
 on:
   push:
     tags:
-      - 'v*' # example: v1.0.0
+      - "win-v*" # example: win-v1.0.0
 
 jobs:
   build:
-    strategy:
-      matrix:
-        # os: [ubuntu-latest, windows-latest, macos-latest]
-        os: [windows-latest]
-
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
 
     steps:
       - name: Checkout
@@ -41,8 +36,6 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          files: |
-            artifacts/**/*.zip
-            artifacts/**/*.tar.zst
+          files: artifacts/**/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
