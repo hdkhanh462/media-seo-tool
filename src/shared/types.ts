@@ -28,9 +28,14 @@ export type ExportToJSONOptions = {
   includeNull?: boolean;
 };
 
+export type StartQueueOptions = {
+  folderPath: string;
+  media: MediaInQueue[];
+};
+
 export type ExportMediaOptions = {
   fullPath: string;
-  media: MediaWithExif[];
+  media: MediaInQueue[];
   overwrite?: boolean;
 } & (
   | { type: "xlsx"; meta?: ExportToExcelOptions }
@@ -73,13 +78,15 @@ export type MediaWithExif = {
 
 export type MediaInQueue = Pick<MediaWithExif, "name" | "exif">;
 
+export type Counter = {
+  total: number;
+  success: number;
+  failed: number;
+};
+
 export type MedialInFolderResult = {
   rows: MediaWithExif[];
-  counter: {
-    total: number;
-    success: number;
-    failed: number;
-  };
+  counter: Counter;
 };
 
 export type MainWebviewRPCType = {
@@ -127,7 +134,11 @@ export type MainWebviewRPCType = {
       };
       importMedia: {
         params: { fullPath: string };
-        response: MediaWithExif[];
+        response: MediaInQueue[];
+      };
+      startQueue: {
+        params: StartQueueOptions;
+        response: Counter;
       };
     };
     messages: {

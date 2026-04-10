@@ -1,7 +1,11 @@
 import path from "node:path";
 import { BrowserView, BrowserWindow, Screen } from "electrobun/bun";
 import type { MainWebviewRPCType } from "~/shared/types";
-import { checkFileExists, getMedialInFolder } from "./services/editor.service";
+import {
+  checkFileExists,
+  getMedialInFolder,
+  startQueue,
+} from "./services/editor.service";
 import { exportMedia } from "./services/export.service";
 import { extractMetadata as bunExtractMetadata } from "./services/extract.service";
 import { loadHistory, updateHistory } from "./services/history.service";
@@ -101,6 +105,9 @@ const mainWebviewRPC = BrowserView.defineRPC<MainWebviewRPCType>({
       importMedia: async (params) => {
         return importMedia(params.fullPath);
       },
+      startQueue: async (params) => {
+        return startQueue(params);
+      },
     },
     // When the browser sends a message we can handle it
     // in the main bun process
@@ -142,7 +149,7 @@ const mainWebviewRPC = BrowserView.defineRPC<MainWebviewRPCType>({
 const { width, height } = Screen.getPrimaryDisplay().workArea;
 
 const mainWindow = new BrowserWindow({
-  title: "Media SEO Tool",
+  title: "Media SEO Editor",
   url,
   frame: {
     width,
@@ -154,4 +161,4 @@ const mainWindow = new BrowserWindow({
   titleBarStyle: "hidden",
 });
 
-console.log("Media SEO Tool started!");
+console.log("Media SEO Editor started!");

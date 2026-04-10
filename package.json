@@ -1,13 +1,14 @@
 {
-  "name": "media-seo-tool",
-  "version": "0.1.1",
-  "description": "A media SEO tool built with Electrobun",
+  "name": "media-seo-editor",
+  "version": "0.1.2",
+  "description": "A media SEO editor built with Electrobun",
   "scripts": {
     "start": "vite build && electrobun dev",
     "dev": "electrobun dev --watch",
     "dev:hmr": "concurrently \"bun run hmr\" \"bun run start\"",
     "hmr": "vite --port 5173",
     "build:canary": "vite build && electrobun build --env=canary",
+    "check-types": "tsc --noEmit",
     "check": "biome check --write .",
     "check:unsafe": "biome check --write --unsafe ."
   },

@@ -91,6 +91,7 @@ export const ExifForm: React.FC<Props> = ({
                 disabled={disabled}
               >
                 {Array.from({ length: 5 }, (_, i) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: <>
                   <RatingItem key={i}>
                     <StarIcon />
                   </RatingItem>

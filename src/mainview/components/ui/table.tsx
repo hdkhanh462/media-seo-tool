@@ -3,17 +3,36 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 function Table({ className, ...props }: React.ComponentProps<"table">) {
-  const handleHorizontalScroll = (e: React.WheelEvent<HTMLDivElement>) => {
-    if (e.deltaY === 0) return;
+  const ref = React.useRef<HTMLDivElement>(null);
 
-    e.currentTarget.scrollLeft += e.deltaY;
-  };
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY === 0) return;
+
+      const canScroll = el.scrollWidth > el.clientWidth;
+      if (!canScroll) return;
+
+      e.preventDefault();
+      el.scrollLeft += e.deltaY;
+    };
+
+    el.addEventListener("wheel", handleWheel, {
+      passive: false,
+    });
+
+    return () => {
+      el.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
 
   return (
     <div
+      ref={ref}
       data-slot="table-container"
       className="relative w-full overflow-x-auto overflow-y-hidden"
-      onWheel={handleHorizontalScroll}
     >
       <table
         data-slot="table"

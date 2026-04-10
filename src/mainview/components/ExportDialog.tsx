@@ -3,6 +3,7 @@ import { useEffect, useMemo } from "react";
 import { Controller, type UseFormReturn } from "react-hook-form";
 import { DialogWrapper } from "@/components/dialog-wrapper";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Field,
   FieldDescription,
@@ -24,7 +25,6 @@ import { cn } from "@/lib/utils";
 import { useEditorStore } from "@/store/useEditorStore";
 import type { ExportValues } from "@/types/import-export.types";
 import { getTimeStamp } from "@/utils/datetime";
-import { Checkbox } from "./ui/checkbox";
 
 type Props = Omit<React.ComponentProps<typeof DialogWrapper>, "footer"> & {
   form: UseFormReturn<ExportValues>;

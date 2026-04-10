@@ -1,22 +1,22 @@
 import { create } from "zustand";
-import type { ExportType, MediaWithExif } from "~/shared/types";
+import type { ExportType, MediaInQueue } from "~/shared/types";
 
 export type EditorTab = "media" | "queue";
 
 interface EditorState {
   activeTab: EditorTab;
   exportType: ExportType;
-  mediaQueue: MediaWithExif[];
-  selectedMedia: MediaWithExif | null;
+  mediaQueue: MediaInQueue[];
+  selectedMedia: MediaInQueue | null;
   selectFolderPath: string | null;
   setActiveTab: (tab: EditorTab) => void;
   setExportType: (type: ExportType) => void;
-  setSelectedMedia: (media: MediaWithExif | null) => void;
+  setSelectedMedia: (media: MediaInQueue | null) => void;
   setSelectFolderPath: (path: string | null) => void;
-  setMediaQueue: (mediaQueue: MediaWithExif[]) => void;
-  addMediaToQueue: (media: MediaWithExif) => void;
-  updateMediaInQueue: (media: MediaWithExif) => void;
-  removeMediaFromQueue: (media: MediaWithExif) => void;
+  setMediaQueue: (mediaQueue: MediaInQueue[]) => void;
+  addMediaToQueue: (media: MediaInQueue) => void;
+  updateMediaInQueue: (media: MediaInQueue) => void;
+  removeMediaFromQueue: (media: MediaInQueue) => void;
 }
 
 export const useEditorStore = create<EditorState>((set) => ({

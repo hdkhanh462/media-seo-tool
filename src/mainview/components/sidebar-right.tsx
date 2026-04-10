@@ -16,7 +16,7 @@ import { ExifSchema } from "@/schemas/exif.schemas";
 import { useEditorStore } from "@/store/useEditorStore";
 import type { ExifValues } from "@/types/exif.types";
 import { middleEllipsis } from "@/utils/formatter";
-import type { MediaWithExif } from "~/shared/types";
+import type { MediaInQueue } from "~/shared/types";
 
 const DEFAULT_VALUES: ExifValues = {
   title: "",
@@ -74,8 +74,8 @@ export function SidebarRight({
   const handleSubmit = (data: ExifValues) => {
     if (!selectedMedia) return;
 
-    const mediaWithExif: MediaWithExif = {
-      ...selectedMedia,
+    const mediaWithExif: MediaInQueue = {
+      name: selectedMedia.name,
       exif: {
         title: data.title || undefined,
         description: data.description || undefined,

@@ -7,8 +7,14 @@ import {
   checkFileExists,
   exportMedia,
   importMedia,
+  startQueue,
 } from "@/services/editor.service";
-import type { ExportMediaOptions, MediaWithExif } from "~/shared/types";
+import type {
+  Counter,
+  ExportMediaOptions,
+  MediaInQueue,
+  StartQueueOptions,
+} from "~/shared/types";
 
 export const checkFileExistsQueryKeys = {
   all: ["checkFileExists"],
@@ -39,10 +45,19 @@ export const useExportMedia = (
 };
 
 export const useImportMedia = (
-  options?: UseMutationOptions<MediaWithExif[], Error, { fullPath: string }>,
+  options?: UseMutationOptions<MediaInQueue[], Error, { fullPath: string }>,
 ) => {
   return useMutation({
     ...options,
     mutationFn: (options) => importMedia(options),
+  });
+};
+
+export const useStartQueue = (
+  options?: UseMutationOptions<Counter, Error, StartQueueOptions>,
+) => {
+  return useMutation({
+    ...options,
+    mutationFn: (options) => startQueue(options),
   });
 };

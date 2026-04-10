@@ -4,6 +4,7 @@ import {
   FileDownIcon,
   FileUpIcon,
   FolderOpenIcon,
+  Loader2Icon,
   PlayIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -27,13 +28,17 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDialog } from "@/hooks/use-dialog";
-import { useExportMedia, useImportMedia } from "@/hooks/useExportMedia";
+import {
+  useExportMedia,
+  useImportMedia,
+  useStartQueue,
+} from "@/hooks/useExportMedia";
 import { useMediaInFolder } from "@/hooks/useGetMediaInFolder";
 import { useSelectFolder } from "@/hooks/useSelectFolder";
 import { ExportSchema, ImportSchema } from "@/schemas/import-export.schemas";
 import { type EditorTab, useEditorStore } from "@/store/useEditorStore";
 import type { ExportValues, ImportValues } from "@/types/import-export.types";
-import type { ExportType, MediaWithExif } from "~/shared/types";
+import type { ExportType, MediaInQueue } from "~/shared/types";
 
 const EXPORT_TYPES: { value: ExportType; label: string }[] = [
   { value: "xlsx", label: "Excel" },
@@ -79,6 +84,32 @@ export const EditorContainer = () => {
   const exportQueueDialog = useDialog();
   const importQueueDialog = useDialog();
   const mediaInFolder = useMediaInFolder(selectFolderPath);
+  const startQueue = useStartQueue({
+    onSuccess: (data) => {
+      if (data.success > 0 && data.success < data.total) {
+        toast.success(
+          `Update exif for media successfully (${data.success}/${data.total})`,
+          {
+            description: `Failed: (${data.failed}/${data.total})`,
+          },
+        );
+      } else if (data.success === data.total) {
+        toast.success(
+          `Update exif for media successfully (${data.success}/${data.total})`,
+        );
+        setMediaQueue([]);
+      } else if (data.failed === data.total) {
+        toast.error(
+          `Update exif for media failed (${data.failed}/${data.total})`,
+        );
+      }
+    },
+    onError: (error) => {
+      toast.error("Update exif for media failed", {
+        description: error.message,
+      });
+    },
+  });
 
   const [mediaRowSelection, setMediaRowSelection] = useState<RowSelectionState>(
     {},
@@ -166,7 +197,7 @@ export const EditorContainer = () => {
   const updateSelectRow = (
     updater: Updater<RowSelectionState>,
     rowSelection: RowSelectionState,
-    data: MediaWithExif[],
+    data: MediaInQueue[],
   ) => {
     const newState =
       typeof updater === "function" ? updater(rowSelection) : updater;
@@ -218,6 +249,18 @@ export const EditorContainer = () => {
     });
   };
 
+  const handleStartQueue = () => {
+    if (!selectFolderPath) {
+      toast.error("Please select a folder path");
+      return;
+    }
+
+    startQueue.mutate({
+      folderPath: selectFolderPath,
+      media: mediaQueue,
+    });
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -237,9 +280,21 @@ export const EditorContainer = () => {
               <TabsTrigger value="queue">Queue List</TabsTrigger>
             </TabsList>
           </Tabs>
-          <Button>
-            <PlayIcon />
-            Start Queue
+          <Button
+            onClick={handleStartQueue}
+            disabled={mediaQueue.length === 0 || startQueue.isPending}
+          >
+            {startQueue.isPending ? (
+              <>
+                <Loader2Icon className="animate-spin" />
+                Starting...
+              </>
+            ) : (
+              <>
+                <PlayIcon />
+                Start Queue
+              </>
+            )}
           </Button>
         </div>
       </div>
